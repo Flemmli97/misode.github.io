@@ -9,7 +9,7 @@ import { defineConfig } from 'vite'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 const config = require('./src/config.json')
 const English = require('./src/locales/en.json')
-
+ 
 const guides = glob.sync('src/guides/**/*.md').flatMap(g => {
 	const content = fs.readFileSync(g).toString('utf-8')
 	if (!content.startsWith('---')) return []
