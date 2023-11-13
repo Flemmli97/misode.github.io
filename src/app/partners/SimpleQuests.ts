@@ -51,7 +51,6 @@ export function initSimpleQuests(schemas: SchemaRegistry, collections: Collectio
 				match: (v) => {
 					var _a
 					const type = (_a = v === null || v === void 0 ? void 0 : v.type) === null || _a === void 0 ? void 0 : _a
-					console.log("type ", type)
 					if (type == 'with_description')
 						return true
 					const keys = v ? Object.keys(v) : []
@@ -64,7 +63,7 @@ export function initSimpleQuests(schemas: SchemaRegistry, collections: Collectio
 				change: _ => ({ type: 'with_description' })
 			}
 		])
-		return c
+		return ListNode(c, { minLength: 1 })
 	}
 
 	const DescriptiveList = (node: INode) => {
@@ -209,7 +208,7 @@ export function initSimpleQuests(schemas: SchemaRegistry, collections: Collectio
 		id: StringNode({ enum: Object.keys(values) }),
 		[Switch]: [{ push: 'id' }],
 		[Case]: values
-	}, { context: `${ID}.quest_entries`, disableSwitchContext: true}))
+	}, { context: `${ID}.quest_entries`, disableSwitchContext: true }))
 
 	let quest = modidPrefix("quest")
 	let composite = modidPrefix("composite_quest")
@@ -226,7 +225,7 @@ export function initSimpleQuests(schemas: SchemaRegistry, collections: Collectio
 	}
 
 	schemas.register(`${ID}:quest`, ObjectNode({
-		category: StringNode({ validator: 'resource', params: { pool: collections.get(`${ID}.quest_category`) } }),
+		category: Opt(StringNode({ validator: 'resource', params: { pool: collections.get(`${ID}.quest_category`) } })),
 		task: StringNode(),
 		description: Opt(ListNode(StringNode())),
 		parent: Opt(ListNode(StringNode({ validator: 'resource', params: { pool: collections.get(`${ID}.quest`) } }))),
