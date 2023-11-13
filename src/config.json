@@ -393,6 +393,24 @@
       "partner": "immersive_weathering",
       "schema": "immersive_weathering:block_growth",
       "minVersion": "1.18.2"
+    },
+    {
+      "id": "quest_category",
+      "url": "partners/simplequests/quest-category",
+      "path": "simplequests/quest_category",
+      "tags": ["partners/simplequests"],
+      "partner": "simplequests",
+      "schema": "simplequests:quest_category",
+      "minVersion": "1.18.2"
+    },
+    {
+      "id": "quest",
+      "url": "partners/simplequests/quest",
+      "path": "simplequests/quest",
+      "tags": ["partners/simplequests"],
+      "partner": "simplequests",
+      "schema": "simplequests:quest",
+      "minVersion": "1.18.2"
     }
   ]
 }
