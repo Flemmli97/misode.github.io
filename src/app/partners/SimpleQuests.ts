@@ -241,7 +241,7 @@ export function initSimpleQuests(schemas: SchemaRegistry, collections: Collectio
 		[Switch]: [{ push: 'type' }],
 		[Case]: {
 			[quest]: {
-				loot_table: StringNode({ validator: 'resource', params: { pool: [], allowUnknown: true } }),
+				loot_table: StringNode({ validator: 'resource', params: { pool: '$loot_table', allowUnknown: true } }),
 				command: Opt(StringNode()),
 				submission_trigger: Opt(StringNode()),
 				entries: MapNode(StringNode(), Reference(`${ID}:quest_entries`)),
@@ -250,7 +250,7 @@ export function initSimpleQuests(schemas: SchemaRegistry, collections: Collectio
 				quests: ListNode(StringNode({ validator: 'resource', params: { pool: [], allowUnknown: true } }), { minLength: 1 }),
 			},
 			[sequential]: {
-				loot_table: StringNode({ validator: 'resource', params: { pool: [], allowUnknown: true } }),
+				loot_table: StringNode({ validator: 'resource', params: { pool: '$loot_table', allowUnknown: true } }),
 				command: Opt(StringNode()),
 				quests: ListNode(StringNode({ validator: 'resource', params: { pool: [], allowUnknown: true } }), { minLength: 1 }),
 			}
