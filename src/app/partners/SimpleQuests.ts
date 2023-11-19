@@ -237,6 +237,7 @@ export function initSimpleQuests(schemas: SchemaRegistry, collections: Collectio
 		repeat_daily: Opt(NumberNode({ integer: true })),
 		sorting_id: Opt(NumberNode({ integer: true })),
 		daily_quest: Opt(BooleanNode()),
+		visibility: Opt(StringNode({ enum: ['DEFAULT', 'ALWAYS', 'NEVER'] })),
 		type: StringNode({ enum: [quest, composite, sequential] }),
 		[Switch]: [{ push: 'type' }],
 		[Case]: {
