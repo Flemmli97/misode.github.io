@@ -66,7 +66,7 @@ async function getVersion(id: VersionId): Promise<VersionData> {
 				const blockStates: BlockStateRegistry = {}
 				await fetchData(id, collections, blockStates)
 				const schemas = mcschema.getSchemas(collections)
-				initPartners(schemas, collections)
+				initPartners(id, schemas, collections)
 				Versions[id] = { collections, schemas, blockStates }
 				return Versions[id]
 			} catch (e) {

@@ -1,6 +1,6 @@
 import type { CollectionRegistry, INode, NestedNodeChildren, SchemaRegistry } from '@mcschema/core'
 import { BooleanNode, Case, ChoiceNode, ListNode, MapNode, NumberNode, ObjectNode, Opt, Reference as RawReference, StringNode as RawStringNode, Switch } from '@mcschema/core'
-import { useVersion } from '../contexts/index.js'
+import { VersionId } from '../services/Schemas.js'
 
 const ID = 'simplequests'
 
@@ -12,11 +12,9 @@ const DATE = new RegExp("^(?:(?<weeks>[0-9]{1,2})w)?" +
 	"(?:(?:^|:)(?<minutes>[0-9]{1,2})m)?" +
 	"(?:(?:^|:)(?<seconds>[0-9]{1,2})s)?$")
 
-export function initSimpleQuests(schemas: SchemaRegistry, collections: CollectionRegistry) {
+export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, collections: CollectionRegistry) {
 	const Reference = RawReference.bind(undefined, schemas)
 	const StringNode = RawStringNode.bind(undefined, collections)
-
-	const version = () => useVersion()
 
 	const ItemStack = ObjectNode({
 		item: StringNode({ validator: 'resource', params: { pool: 'item' } }),
@@ -81,7 +79,7 @@ export function initSimpleQuests(schemas: SchemaRegistry, collections: Collectio
 	})
 
 	let playerPredicate_updated = Opt(Reference('entity_predicate'));
-	playerPredicate_updated.enabled = (_p) => version().version == "1.18.2" || version().version == "1.20.2"
+	playerPredicate_updated.enabled = (_p) => version == "1.18.2" || version == "1.20.2"
 
 	//Quest-entry types
 	var values: NestedNodeChildren = {}
