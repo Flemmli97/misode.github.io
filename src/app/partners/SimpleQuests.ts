@@ -1,5 +1,6 @@
 import type { CollectionRegistry, INode, NestedNodeChildren, SchemaRegistry } from '@mcschema/core'
 import { BooleanNode, Case, ChoiceNode, ListNode, MapNode, NumberNode, ObjectNode, Opt, Reference as RawReference, StringNode as RawStringNode, Switch } from '@mcschema/core'
+import { useVersion } from '../contexts/index.js'
 
 const ID = 'simplequests'
 
@@ -14,6 +15,8 @@ const DATE = new RegExp("^(?:(?<weeks>[0-9]{1,2})w)?" +
 export function initSimpleQuests(schemas: SchemaRegistry, collections: CollectionRegistry) {
 	const Reference = RawReference.bind(undefined, schemas)
 	const StringNode = RawStringNode.bind(undefined, collections)
+
+	const version = () => useVersion()
 
 	const ItemStack = ObjectNode({
 		item: StringNode({ validator: 'resource', params: { pool: 'item' } }),
@@ -77,6 +80,9 @@ export function initSimpleQuests(schemas: SchemaRegistry, collections: Collectio
 		z: NumberNode({ integer: true })
 	})
 
+	let playerPredicate_updated = Opt(Reference('entity_predicate'));
+	playerPredicate_updated.enabled = (_p) => version().version == "1.18.2" || version().version == "1.20.2"
+
 	//Quest-entry types
 	var values: NestedNodeChildren = {}
 	values[modidPrefix("item")] = {
@@ -84,56 +90,68 @@ export function initSimpleQuests(schemas: SchemaRegistry, collections: Collectio
 		description: Opt(StringNode()),
 		amount: NumberNode({ integer: true, min: 1 }),
 		consumeItems: BooleanNode(),
+		playerPredicate: playerPredicate_updated,
 	}
 	values[modidPrefix("multi_item")] = {
 		predicate: DescriptiveListOpt(() => Reference('item_predicate')),
 		description: StringNode(),
 		amount: Reference('number_provider'),
 		consumeItems: BooleanNode(),
+		playerPredicate: playerPredicate_updated,
 	}
 	values[modidPrefix("entity")] = {
 		predicate: Reference('entity_predicate'),
 		description: Opt(StringNode()),
 		amount: NumberNode({ integer: true, min: 1 }),
+		playerPredicate: playerPredicate_updated,
 	}
 	values[modidPrefix("multi_kill")] = {
 		predicate: DescriptiveListOpt(() => Reference('entity_predicate')),
 		description: StringNode(),
 		amount: Reference('number_provider'),
+		playerPredicate: playerPredicate_updated,
 	}
 	values[modidPrefix("xp")] = {
 		amount: NumberNode({ integer: true, min: 1 }),
+		playerPredicate: playerPredicate_updated,
 	}
 	values[modidPrefix("multi_xp")] = {
 		amount: Reference('number_provider'),
 		description: StringNode(),
+		playerPredicate: playerPredicate_updated,
 	}
 	values[modidPrefix("advancement")] = {
 		advancement: StringNode({ validator: 'resource', params: { pool: "$advancement" } }),
 		reset: BooleanNode(),
+		playerPredicate: playerPredicate_updated,
 	}
 	values[modidPrefix("multi_advancements")] = {
 		advancement: ListNode(StringNode({ validator: 'resource', params: { pool: "$advancement" } }), { minLength: 1 }),
 		description: StringNode(),
 		reset: BooleanNode(),
+		playerPredicate: playerPredicate_updated,
 	}
 	values[modidPrefix("position")] = {
 		pos: BlockPos,
 		minDist: NumberNode({ min: 0, integer: true }),
 		description: Opt(StringNode()),
+		playerPredicate: playerPredicate_updated,
 	}
 	values[modidPrefix("multi_position")] = {
 		pos: DescriptiveListOpt(() => BlockPos),
 		minDist: NumberNode({ min: 0, integer: true }),
 		description: Opt(StringNode()),
+		playerPredicate: playerPredicate_updated,
 	}
 	values[modidPrefix("location")] = {
 		predicate: Reference('location_predicate'),
 		description: StringNode(),
+		playerPredicate: playerPredicate_updated,
 	}
 	values[modidPrefix("multi_location")] = {
 		predicate: DescriptiveList(Reference('location_predicate')),
 		description: StringNode(),
+		playerPredicate: playerPredicate_updated,
 	}
 	values[modidPrefix("entity_interact")] = {
 		description: StringNode(),
@@ -142,7 +160,8 @@ export function initSimpleQuests(schemas: SchemaRegistry, collections: Collectio
 		item: Opt(Reference('item_predicate')),
 		predicate: Opt(Reference('entity_predicate')),
 		amount: NumberNode({ min: 1, integer: true }),
-		consume: BooleanNode()
+		consume: BooleanNode(),
+		playerPredicate: playerPredicate_updated,
 	}
 	values[modidPrefix("multi_entity_interaction")] = {
 		description: StringNode(),
@@ -150,7 +169,8 @@ export function initSimpleQuests(schemas: SchemaRegistry, collections: Collectio
 		itemPredicates: Opt(DescriptiveList(Reference('item_predicate'))),
 		entityPredicates: Opt(DescriptiveList(Reference('entity_predicate'))),
 		amount: Reference('number_provider'),
-		consume: BooleanNode()
+		consume: BooleanNode(),
+		playerPredicate: playerPredicate_updated,
 	}
 	values[modidPrefix("block_interact")] = {
 		description: StringNode(),
@@ -160,7 +180,8 @@ export function initSimpleQuests(schemas: SchemaRegistry, collections: Collectio
 		block: Opt(Reference('block_predicate')),
 		amount: NumberNode({ min: 1, integer: true }),
 		use: BooleanNode(),
-		consumeItem: BooleanNode()
+		consumeItem: BooleanNode(),
+		playerPredicate: playerPredicate_updated,
 	}
 	values[modidPrefix("multi_block_interaction")] = {
 		description: StringNode(),
@@ -169,7 +190,8 @@ export function initSimpleQuests(schemas: SchemaRegistry, collections: Collectio
 		blockPredicates: Opt(DescriptiveList(Reference('block_predicate'))),
 		amount: Reference('number_provider'),
 		use: BooleanNode(),
-		consumeItem: BooleanNode()
+		consumeItem: BooleanNode(),
+		playerPredicate: playerPredicate_updated,
 	}
 	values[modidPrefix("crafting")] = {
 		description: StringNode(),
