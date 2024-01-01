@@ -22,7 +22,7 @@ interface Props {
 export function SchemaGenerator({ gen, allowedVersions }: Props) {
 	const { locale } = useLocale()
 	const { version, changeVersion, changeTargetVersion } = useVersion()
-	const { projects, project, file, updateProject, updateFile } = useProject()
+	const { projects, project, file, updateProject, updateFile, closeFile } = useProject()
 	const [error, setError] = useState<Error | string | null>(null)
 	const [errorBoundary, errorRetry] = useErrorBoundary()
 	if (errorBoundary) {
@@ -250,11 +250,6 @@ export function SchemaGenerator({ gen, allowedVersions }: Props) {
 		Analytics.downloadOutput(gen.id, 'menu')
 		setDownload(doDownload + 1)
 	}
-	const importSource = () => {
-		Analytics.generatorEvent('import')
-		setSourceShown(true)
-		setImport(doImport + 1)
-	}
 	const toggleSource = () => {
 		if (sourceShown) {
 			Analytics.hideOutput(gen.id, 'menu')
@@ -304,12 +299,29 @@ export function SchemaGenerator({ gen, allowedVersions }: Props) {
 	const [createFile, setCreateFile] = useState<string | undefined>(undefined)
 	const [fileSaving, setFileSaving] = useState<string | undefined>(undefined)
 	const [fileRenaming, setFileRenaming] = useState<{ type: string, id: string } | undefined>(undefined)
+	const [newFileQueued, setNewFileQueued] = useState(false)
+
+	const onNewFile = useCallback(() => {
+		closeFile()
+		// Need to queue reset because otherwise the useModel hook will update the old file
+		setNewFileQueued(true)
+	}, [closeFile])
+
+	useEffect(() => {
+		if (file === undefined && newFileQueued) {
+			model?.reset(DataModel.wrapLists(model.schema.default()), true)
+			setNewFileQueued(false)
+		}
+	}, [model, newFileQueued, file])
 
 	return <>
 		<main class={`generator${previewShown ? ' has-preview' : ''}${projectShown ? ' has-project' : ''}`}>
 			{!gen.partner && <Ad id="data-pack-generator" type="text" />}
 			<div class="controls generator-controls">
-				<Btn icon="upload" label={locale('import')} onClick={importSource} />
+				{gen.wiki && <a class="btn btn-link tooltipped tip-se" aria-label={locale('learn_on_the_wiki')} href={`https://minecraft.wiki/w/${gen.wiki}`} target="_blank">
+					{Octicon.mortar_board}
+					<span>{locale('wiki')}</span>
+				</a>}
 				<BtnMenu icon="archive" label={locale('presets')} relative={false}>
 					<SearchList searchPlaceholder={locale('search')} noResults={locale('no_presets')} values={presets} onSelect={selectPreset}/>
 				</BtnMenu>
@@ -320,6 +332,7 @@ export function SchemaGenerator({ gen, allowedVersions }: Props) {
 					{backup !== undefined && <Btn icon="history" label={locale('restore_backup')} onClick={loadBackup} />}
 					<Btn icon="arrow_left" label={locale('undo')} onClick={undo} />
 					<Btn icon="arrow_right" label={locale('redo')} onClick={redo} />
+					<Btn icon="plus_circle" label={locale('project.new_file')} onClick={onNewFile} />
 					<Btn icon="file" label={locale('project.save')} onClick={() => setFileSaving('menu')} />
 				</BtnMenu>
 			</div>
