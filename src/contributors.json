@@ -154,7 +154,7 @@
   },
   {
     "name": "ApolloDatapacks",
-    "types": ["report", "content"],
+    "types": ["report"],
     "avatar": "https://avatars.githubusercontent.com/u/102649729?v=4",
     "url": "https://github.com/ApolloDatapacks"
   },
@@ -895,5 +895,11 @@
     "types": ["translation"],
     "avatar": "https://avatars.githubusercontent.com/u/56648332?v=4",
     "url": "https://github.com/Neylz"
+  },
+  {
+    "name":"efekos",
+    "types":["translation"],
+    "avatar":"https://avatars.githubusercontent.com/u/56752400?v=4",
+    "url":"https://github.com/efekos"
   }
 ]
