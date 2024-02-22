@@ -78,150 +78,151 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 		z: NumberNode({ integer: true })
 	})
 
-	let playerPredicate_updated = Opt(Reference('entity_predicate'));
+	let playerPredicate_updated = Opt(Reference('entity_predicate'))
 	playerPredicate_updated.enabled = (_p) => version == "1.18.2" || version == "1.20.2"
 
 	//Quest-entry types
-	var values: NestedNodeChildren = {}
-	values[modidPrefix("item")] = {
-		predicate: Reference('item_predicate'),
-		description: Opt(StringNode()),
-		amount: NumberNode({ integer: true, min: 1 }),
-		consumeItems: BooleanNode(),
-		playerPredicate: playerPredicate_updated,
-	}
-	values[modidPrefix("multi_item")] = {
-		predicate: DescriptiveListOpt(() => Reference('item_predicate')),
-		description: StringNode(),
-		amount: Reference('number_provider'),
-		consumeItems: BooleanNode(),
-		playerPredicate: playerPredicate_updated,
-	}
-	values[modidPrefix("entity")] = {
-		predicate: Reference('entity_predicate'),
-		description: Opt(StringNode()),
-		amount: NumberNode({ integer: true, min: 1 }),
-		playerPredicate: playerPredicate_updated,
-	}
-	values[modidPrefix("multi_kill")] = {
-		predicate: DescriptiveListOpt(() => Reference('entity_predicate')),
-		description: StringNode(),
-		amount: Reference('number_provider'),
-		playerPredicate: playerPredicate_updated,
-	}
-	values[modidPrefix("xp")] = {
-		amount: NumberNode({ integer: true, min: 1 }),
-		playerPredicate: playerPredicate_updated,
-	}
-	values[modidPrefix("multi_xp")] = {
-		amount: Reference('number_provider'),
-		description: StringNode(),
-		playerPredicate: playerPredicate_updated,
-	}
-	values[modidPrefix("advancement")] = {
-		advancement: StringNode({ validator: 'resource', params: { pool: "$advancement" } }),
-		reset: BooleanNode(),
-		playerPredicate: playerPredicate_updated,
-	}
-	values[modidPrefix("multi_advancements")] = {
-		advancement: ListNode(StringNode({ validator: 'resource', params: { pool: "$advancement" } }), { minLength: 1 }),
-		description: StringNode(),
-		reset: BooleanNode(),
-		playerPredicate: playerPredicate_updated,
-	}
-	values[modidPrefix("position")] = {
-		pos: BlockPos,
-		minDist: NumberNode({ min: 0, integer: true }),
-		description: Opt(StringNode()),
-		playerPredicate: playerPredicate_updated,
-	}
-	values[modidPrefix("multi_position")] = {
-		pos: DescriptiveListOpt(() => BlockPos),
-		minDist: NumberNode({ min: 0, integer: true }),
-		description: Opt(StringNode()),
-		playerPredicate: playerPredicate_updated,
-	}
-	values[modidPrefix("location")] = {
-		predicate: Reference('location_predicate'),
-		description: StringNode(),
-		playerPredicate: playerPredicate_updated,
-	}
-	values[modidPrefix("multi_location")] = {
-		predicate: DescriptiveList(Reference('location_predicate')),
-		description: StringNode(),
-		playerPredicate: playerPredicate_updated,
-	}
-	values[modidPrefix("entity_interact")] = {
-		description: StringNode(),
-		//heldDescription: Opt(StringNode()), Just for record. shouldnt be used
-		//entityDescription: Opt(StringNode()),
-		item: Opt(Reference('item_predicate')),
-		predicate: Opt(Reference('entity_predicate')),
-		amount: NumberNode({ min: 1, integer: true }),
-		consume: BooleanNode(),
-		playerPredicate: playerPredicate_updated,
-	}
-	values[modidPrefix("multi_entity_interaction")] = {
-		description: StringNode(),
-		taskDescription: StringNode(),
-		itemPredicates: Opt(DescriptiveList(Reference('item_predicate'))),
-		entityPredicates: Opt(DescriptiveList(Reference('entity_predicate'))),
-		amount: Reference('number_provider'),
-		consume: BooleanNode(),
-		playerPredicate: playerPredicate_updated,
-	}
-	values[modidPrefix("block_interact")] = {
-		description: StringNode(),
-		//heldDescription: Opt(StringNode()), Just for record. shouldnt be used
-		//blockDescription: Opt(StringNode()),
-		item: Opt(Reference('item_predicate')),
-		block: Opt(Reference('block_predicate')),
-		amount: NumberNode({ min: 1, integer: true }),
-		use: BooleanNode(),
-		consumeItem: BooleanNode(),
-		playerPredicate: playerPredicate_updated,
-	}
-	values[modidPrefix("multi_block_interaction")] = {
-		description: StringNode(),
-		taskDescription: StringNode(),
-		itemPredicates: Opt(DescriptiveList(Reference('item_predicate'))),
-		blockPredicates: Opt(DescriptiveList(Reference('block_predicate'))),
-		amount: Reference('number_provider'),
-		use: BooleanNode(),
-		consumeItem: BooleanNode(),
-		playerPredicate: playerPredicate_updated,
-	}
-	values[modidPrefix("crafting")] = {
-		description: StringNode(),
-		//heldDescription: Opt(StringNode()), Just for record. shouldnt be used
-		//blockDescription: Opt(StringNode()),
-		item: Reference('item_predicate'),
-		playerPredicate: Opt(Reference('entity_predicate')),
-		amount: NumberNode({ min: 1, integer: true })
-	}
-	values[modidPrefix("multi_crafting")] = {
-		description: StringNode(),
-		taskDescription: StringNode(),
+	var values: NestedNodeChildren = {
+		[modidPrefix("item")]: {
+			predicate: Reference('item_predicate'),
+			description: Opt(StringNode()),
+			amount: NumberNode({ integer: true, min: 1 }),
+			consumeItems: BooleanNode(),
+			playerPredicate: playerPredicate_updated,
+		},
+		[modidPrefix("multi_item")]: {
+			predicate: DescriptiveListOpt(() => Reference('item_predicate')),
+			description: StringNode(),
+			amount: Reference('number_provider'),
+			consumeItems: BooleanNode(),
+			playerPredicate: playerPredicate_updated,
+		},
+		[modidPrefix("entity")]: {
+			predicate: Reference('entity_predicate'),
+			description: Opt(StringNode()),
+			amount: NumberNode({ integer: true, min: 1 }),
+			playerPredicate: playerPredicate_updated,
+		},
+		[modidPrefix("multi_kill")]: {
+			predicate: DescriptiveListOpt(() => Reference('entity_predicate')),
+			description: StringNode(),
+			amount: Reference('number_provider'),
+			playerPredicate: playerPredicate_updated,
+		},
+		[modidPrefix("xp")]: {
+			amount: NumberNode({ integer: true, min: 1 }),
+			playerPredicate: playerPredicate_updated,
+		},
+		[modidPrefix("multi_xp")]: {
+			amount: Reference('number_provider'),
+			description: StringNode(),
+			playerPredicate: playerPredicate_updated,
+		},
+		[modidPrefix("advancement")]: {
+			advancement: StringNode({ validator: 'resource', params: { pool: "$advancement" } }),
+			reset: BooleanNode(),
+			playerPredicate: playerPredicate_updated,
+		},
+		[modidPrefix("multi_advancements")]: {
+			advancement: ListNode(StringNode({ validator: 'resource', params: { pool: "$advancement" } }), { minLength: 1 }),
+			description: StringNode(),
+			reset: BooleanNode(),
+			playerPredicate: playerPredicate_updated,
+		},
+		[modidPrefix("position")]: {
+			pos: BlockPos,
+			minDist: NumberNode({ min: 0, integer: true }),
+			description: Opt(StringNode()),
+			playerPredicate: playerPredicate_updated,
+		},
+		[modidPrefix("multi_position")]: {
+			pos: DescriptiveListOpt(() => BlockPos),
+			minDist: NumberNode({ min: 0, integer: true }),
+			description: Opt(StringNode()),
+			playerPredicate: playerPredicate_updated,
+		},
+		[modidPrefix("location")]: {
+			predicate: Reference('location_predicate'),
+			description: StringNode(),
+			playerPredicate: playerPredicate_updated,
+		},
+		[modidPrefix("multi_location")]: {
+			predicate: DescriptiveList(Reference('location_predicate')),
+			description: StringNode(),
+			playerPredicate: playerPredicate_updated,
+		},
+		[modidPrefix("entity_interact")]: {
+			description: StringNode(),
+			//heldDescription: Opt(StringNode()), Just for record. shouldnt be used
+			//entityDescription: Opt(StringNode()),
+			item: Opt(Reference('item_predicate')),
+			predicate: Opt(Reference('entity_predicate')),
+			amount: NumberNode({ min: 1, integer: true }),
+			consume: BooleanNode(),
+			playerPredicate: playerPredicate_updated,
+		},
+		[modidPrefix("multi_entity_interaction")]: {
+			description: StringNode(),
+			taskDescription: StringNode(),
+			itemPredicates: Opt(DescriptiveList(Reference('item_predicate'))),
+			entityPredicates: Opt(DescriptiveList(Reference('entity_predicate'))),
+			amount: Reference('number_provider'),
+			consume: BooleanNode(),
+			playerPredicate: playerPredicate_updated,
+		},
+		[modidPrefix("block_interact")]: {
+			description: StringNode(),
+			//heldDescription: Opt(StringNode()), Just for record. shouldnt be used
+			//blockDescription: Opt(StringNode()),
+			item: Opt(Reference('item_predicate')),
+			block: Opt(Reference('block_predicate')),
+			amount: NumberNode({ min: 1, integer: true }),
+			use: BooleanNode(),
+			consumeItem: BooleanNode(),
+			playerPredicate: playerPredicate_updated,
+		},
+		[modidPrefix("multi_block_interaction")]: {
+			description: StringNode(),
+			taskDescription: StringNode(),
+			itemPredicates: Opt(DescriptiveList(Reference('item_predicate'))),
+			blockPredicates: Opt(DescriptiveList(Reference('block_predicate'))),
+			amount: Reference('number_provider'),
+			use: BooleanNode(),
+			consumeItem: BooleanNode(),
+			playerPredicate: playerPredicate_updated,
+		},
+		[modidPrefix("crafting")]: {
+			description: StringNode(),
+			//heldDescription: Opt(StringNode()), Just for record. shouldnt be used
+			//blockDescription: Opt(StringNode()),
+			item: Reference('item_predicate'),
+			playerPredicate: Opt(Reference('entity_predicate')),
+			amount: NumberNode({ min: 1, integer: true })
+		},
+		[modidPrefix("multi_crafting")]: {
+			description: StringNode(),
+			taskDescription: StringNode(),
 
-		item: DescriptiveList(Reference('item_predicate')),
-		playerPredicate: Opt(DescriptiveList(Reference('entity_predicate'))),
-		amount: Reference('number_provider'),
-	}
-	values[modidPrefix("fishing")] = {
-		description: StringNode(),
-		//heldDescription: Opt(StringNode()), Just for record. shouldnt be used
-		//blockDescription: Opt(StringNode()),
-		item: Reference('item_predicate'),
-		playerPredicate: Opt(Reference('entity_predicate')),
-		amount: NumberNode({ min: 1, integer: true })
-	}
-	values[modidPrefix("multi_fishing")] = {
-		description: StringNode(),
-		taskDescription: StringNode(),
+			item: DescriptiveList(Reference('item_predicate')),
+			playerPredicate: Opt(DescriptiveList(Reference('entity_predicate'))),
+			amount: Reference('number_provider'),
+		},
+		[modidPrefix("fishing")]: {
+			description: StringNode(),
+			//heldDescription: Opt(StringNode()), Just for record. shouldnt be used
+			//blockDescription: Opt(StringNode()),
+			item: Reference('item_predicate'),
+			playerPredicate: Opt(Reference('entity_predicate')),
+			amount: NumberNode({ min: 1, integer: true })
+		},
+		[modidPrefix("multi_fishing")]: {
+			description: StringNode(),
+			taskDescription: StringNode(),
 
-		item: DescriptiveList(Reference('item_predicate')),
-		playerPredicate: Opt(DescriptiveList(Reference('entity_predicate'))),
-		amount: Reference('number_provider'),
+			item: DescriptiveList(Reference('item_predicate')),
+			playerPredicate: Opt(DescriptiveList(Reference('entity_predicate'))),
+			amount: Reference('number_provider'),
+		}
 	}
 
 	schemas.register(`${ID}:quest_entries`, ObjectNode({
