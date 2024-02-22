@@ -570,20 +570,18 @@
       "wiki": "https://github.com/CorgiTaco/Oh-The-Trees-Youll-Grow/wiki/Generating-Your-Tree-With-Data-Packs!"
     },
     {
-      "id": "quest_category",
-      "url": "partners/simplequests/quest-category",
+      "id": "simplequests.quest_category",
+      "url": "simplequests/quest-category",
       "path": "simplequests_categories",
-      "tags": ["partners/simplequests"],
-      "partner": "simplequests",
+      "tags": ["partners"],
       "schema": "simplequests:quest_category",
       "minVersion": "1.18.2"
     },
     {
-      "id": "quest",
-      "url": "partners/simplequests/quest",
+      "id": "simplequests.quest",
+      "url": "simplequests/quest",
       "path": "simplequests",
-      "tags": ["partners/simplequests"],
-      "partner": "simplequests",
+      "tags": ["partners"],
       "schema": "simplequests:quest",
       "minVersion": "1.18.2"
     }

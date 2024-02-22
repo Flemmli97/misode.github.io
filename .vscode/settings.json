@@ -25,5 +25,11 @@
 	"editor.insertSpaces": false,
 	"files.insertFinalNewline": true,
 	"files.trimFinalNewlines": true,
-	"typescript.tsdk": "node_modules\\typescript\\lib"
+	"typescript.tsdk": "node_modules\\typescript\\lib",
+	"[javascript][typescript][typescriptreact]": {
+		"editor.codeActionsOnSave": {
+			"source.organizeImports": "explicit",
+			"source.fixAll.eslint": "explicit"
+		}
+	}
 }
