@@ -160,6 +160,7 @@
   "ohthetreesyoullgrow.configured_feature.config.place_from_nbt.entry": "Block",
   "rule_test.blocks": "Blocks",
   "rule_test.fluid": "Fluid",
+
   "simplequests.itemstack.item": "Item",
   "simplequests.itemstack.count": "Count",
   "simplequests.itemstack.tag": "NBT Tag",
