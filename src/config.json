@@ -575,7 +575,8 @@
       "path": "simplequests_categories",
       "tags": ["partners"],
       "schema": "simplequests:quest_category",
-      "minVersion": "1.18.2"
+      "minVersion": "1.18.2",
+      "wiki": "https://github.com/Flemmli97/SimpleQuests/wiki/Quest-Category"
     },
     {
       "id": "simplequests.quest",
@@ -583,7 +584,8 @@
       "path": "simplequests",
       "tags": ["partners"],
       "schema": "simplequests:quest",
-      "minVersion": "1.18.2"
+      "minVersion": "1.18.2",
+      "wiki": "https://github.com/Flemmli97/SimpleQuests/wiki"
     }
   ],
   "legacyGuides": [
