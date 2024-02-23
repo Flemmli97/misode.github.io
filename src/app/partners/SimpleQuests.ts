@@ -246,14 +246,13 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 		}
 	}
 
-	Object.entries(ADDITIONAL_QUEST_ENTRIES).forEach(v=> {
-		QUEST_ENTRIES[v[0]] = v[1]
-	})
-
 	schemas.register(`${ID}:quest_entries`, ObjectNode({
 		id: StringNode({ enum: Object.keys(QUEST_ENTRIES) }),
 		[Switch]: [{ push: 'id' }],
-		[Case]: QUEST_ENTRIES
+		[Case]: {
+			...QUEST_ENTRIES,
+			...ADDITIONAL_QUEST_ENTRIES
+		}
 	}, { context: `${ID}.quest_entries`, disableSwitchContext: true }))
 
 	const QUEST_TYPES: NestedNodeChildren = {
@@ -272,10 +271,6 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 			quests: ListNode(StringNode({ validator: 'resource', params: { pool: [], allowUnknown: true } }), { minLength: 1 }),
 		},
 	}
-
-	Object.entries(ADDITIONAL_QUESTS).forEach(v=> {
-		QUEST_TYPES[v[0]] = v[1]
-	})
 
 	const TIME = StringNode({ validator: "regex_pattern", params: { 0: "[0-9]" } })
 	TIME.validate = (path, value, err, _) => {
@@ -303,7 +298,10 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 		visibility: Opt(StringNode({ enum: ['DEFAULT', 'ALWAYS', 'NEVER'] })),
 		type: StringNode({ enum: Object.keys(QUEST_TYPES) }),
 		[Switch]: [{ push: 'type' }],
-		[Case]: QUEST_TYPES
+		[Case]: {
+			...QUEST_TYPES,
+			...ADDITIONAL_QUESTS
+		}
 	}, { context: `${ID}.quest` }))
 }
 
