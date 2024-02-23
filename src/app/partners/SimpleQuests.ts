@@ -12,6 +12,21 @@ const DATE = new RegExp("^(?:(?<weeks>[0-9]{1,2})w)?" +
 	"(?:(?:^|:)(?<minutes>[0-9]{1,2})m)?" +
 	"(?:(?:^|:)(?<seconds>[0-9]{1,2})s)?$")
 
+const ADDITIONAL_QUESTS: NestedNodeChildren = {};
+const ADDITIONAL_QUEST_ENTRIES: NestedNodeChildren = {};
+
+export const addAdditionalQuestTypes = (add: NestedNodeChildren) => {
+	Object.entries(add).forEach(v=> {
+		ADDITIONAL_QUESTS[v[0]] = v[1]
+	})
+}
+
+export const addAdditionalQuestEntries = (add: NestedNodeChildren) => {
+	Object.entries(add).forEach(v=> {
+		ADDITIONAL_QUEST_ENTRIES[v[0]] = v[1]
+	})
+}
+
 export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, collections: CollectionRegistry) {
 	const Reference = RawReference.bind(undefined, schemas)
 	const StringNode = RawStringNode.bind(undefined, collections)
@@ -82,7 +97,7 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 	playerPredicate_updated.enabled = (_p) => version == "1.18.2" || version == "1.20.2"
 
 	//Quest-entry types
-	var values: NestedNodeChildren = {
+	const QUEST_ENTRIES: NestedNodeChildren = {
 		[modidPrefix("item")]: {
 			predicate: Reference('item_predicate'),
 			description: Opt(StringNode()),
@@ -222,21 +237,48 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 			item: DescriptiveList(Reference('item_predicate')),
 			playerPredicate: Opt(DescriptiveList(Reference('entity_predicate'))),
 			amount: Reference('number_provider'),
+		},
+		[`${ID}:npc_quest`]: {
+			npc: Reference('item_predicate'),
+			description: Opt(StringNode()),
+			amount: NumberNode({ integer: true, min: 1 }),
+			consumeItems: BooleanNode(),
 		}
 	}
 
+	Object.entries(ADDITIONAL_QUEST_ENTRIES).forEach(v=> {
+		QUEST_ENTRIES[v[0]] = v[1]
+	})
+
 	schemas.register(`${ID}:quest_entries`, ObjectNode({
-		id: StringNode({ enum: Object.keys(values) }),
+		id: StringNode({ enum: Object.keys(QUEST_ENTRIES) }),
 		[Switch]: [{ push: 'id' }],
-		[Case]: values
+		[Case]: QUEST_ENTRIES
 	}, { context: `${ID}.quest_entries`, disableSwitchContext: true }))
 
-	let quest = modidPrefix("quest")
-	let composite = modidPrefix("composite_quest")
-	let sequential = modidPrefix("sequential_quest")
+	const QUEST_TYPES: NestedNodeChildren = {
+		[modidPrefix("quest")]: {
+			loot_table: StringNode({ validator: 'resource', params: { pool: '$loot_table', allowUnknown: true } }),
+			command: Opt(StringNode()),
+			submission_trigger: Opt(StringNode()),
+			entries: MapNode(StringNode(), Reference(`${ID}:quest_entries`)),
+		},
+		[modidPrefix("composite_quest")]: {
+			quests: ListNode(StringNode({ validator: 'resource', params: { pool: [], allowUnknown: true } }), { minLength: 1 }),
+		},
+		[modidPrefix("sequential_quest")]: {
+			loot_table: StringNode({ validator: 'resource', params: { pool: '$loot_table', allowUnknown: true } }),
+			command: Opt(StringNode()),
+			quests: ListNode(StringNode({ validator: 'resource', params: { pool: [], allowUnknown: true } }), { minLength: 1 }),
+		},
+	}
 
-	const time = StringNode({ validator: "regex_pattern", params: { 0: "[0-9]" } })
-	time.validate = (path, value, err, _) => {
+	Object.entries(ADDITIONAL_QUESTS).forEach(v=> {
+		QUEST_TYPES[v[0]] = v[1]
+	})
+
+	const TIME = StringNode({ validator: "regex_pattern", params: { 0: "[0-9]" } })
+	TIME.validate = (path, value, err, _) => {
 		if (NUM.test(value))
 			return parseInt(value)
 		if (!DATE.test(value))
@@ -254,29 +296,14 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 		need_unlock: Opt(BooleanNode()),
 		unlock_condition: Opt(Reference('entity_predicate')),
 		icon: Opt(ItemStack),
-		repeat_delay: Opt(time),
+		repeat_delay: Opt(TIME),
 		repeat_daily: Opt(NumberNode({ integer: true })),
 		sorting_id: Opt(NumberNode({ integer: true })),
 		daily_quest: Opt(BooleanNode()),
 		visibility: Opt(StringNode({ enum: ['DEFAULT', 'ALWAYS', 'NEVER'] })),
-		type: StringNode({ enum: [quest, composite, sequential] }),
+		type: StringNode({ enum: Object.keys(QUEST_TYPES) }),
 		[Switch]: [{ push: 'type' }],
-		[Case]: {
-			[quest]: {
-				loot_table: StringNode({ validator: 'resource', params: { pool: '$loot_table', allowUnknown: true } }),
-				command: Opt(StringNode()),
-				submission_trigger: Opt(StringNode()),
-				entries: MapNode(StringNode(), Reference(`${ID}:quest_entries`)),
-			},
-			[composite]: {
-				quests: ListNode(StringNode({ validator: 'resource', params: { pool: [], allowUnknown: true } }), { minLength: 1 }),
-			},
-			[sequential]: {
-				loot_table: StringNode({ validator: 'resource', params: { pool: '$loot_table', allowUnknown: true } }),
-				command: Opt(StringNode()),
-				quests: ListNode(StringNode({ validator: 'resource', params: { pool: [], allowUnknown: true } }), { minLength: 1 }),
-			}
-		}
+		[Case]: QUEST_TYPES
 	}, { context: `${ID}.quest` }))
 }
 
