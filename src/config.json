@@ -586,6 +586,70 @@
       "schema": "simplequests:quest",
       "minVersion": "1.18.2",
       "wiki": "https://github.com/Flemmli97/SimpleQuests/wiki"
+    },
+    {
+      "id": "runecraftory.crops",
+      "url": "runecraftory/crops",
+      "path": "crop_properties",
+      "tags": ["partners"],
+      "schema": "runecraftory:crops",
+      "minVersion": "1.18.2"
+    },
+    {
+      "id": "runecraftory.food",
+      "url": "runecraftory/food",
+      "path": "food_stats",
+      "tags": ["partners"],
+      "schema": "runecraftory:food",
+      "minVersion": "1.18.2"
+    },
+    {
+      "id": "runecraftory.item_stats",
+      "url": "runecraftory/item_stats",
+      "path": "item_stats",
+      "tags": ["partners"],
+      "schema": "runecraftory:item_stats",
+      "minVersion": "1.18.2"
+    },
+    {
+      "id": "runecraftory.gate_spawning",
+      "url": "runecraftory/gate_spawning",
+      "path": "gate_spawning",
+      "tags": ["partners"],
+      "schema": "runecraftory:gate_spawning",
+      "minVersion": "1.18.2"
+    },
+    {
+      "id": "runecraftory.npc_actions",
+      "url": "runecraftory/npc_actions",
+      "path": "npc_actions",
+      "tags": ["partners"],
+      "schema": "runecraftory:npc_actions",
+      "minVersion": "1.18.2"
+    },
+    {
+      "id": "runecraftory.conversations",
+      "url": "runecraftory/conversations",
+      "path": "conversations",
+      "tags": ["partners"],
+      "schema": "runecraftory:conversations",
+      "minVersion": "1.18.2"
+    },
+    {
+      "id": "runecraftory.npc_looks",
+      "url": "runecraftory/npc_looks",
+      "path": "npc_looks",
+      "tags": ["partners"],
+      "schema": "runecraftory:npc_looks",
+      "minVersion": "1.18.2"
+    },
+    {
+      "id": "runecraftory.npc_data",
+      "url": "runecraftory/npc_data",
+      "path": "npc_data",
+      "tags": ["partners"],
+      "schema": "runecraftory:npc_data",
+      "minVersion": "1.18.2"
     }
   ],
   "legacyGuides": [
