@@ -247,7 +247,7 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 	}
 
 	schemas.register(`${ID}:quest_entries`, ObjectNode({
-		id: StringNode({ enum: Object.keys(QUEST_ENTRIES) }),
+		id: StringNode({ enum: Object.keys(QUEST_ENTRIES).concat(Object.keys(ADDITIONAL_QUEST_ENTRIES)) }),
 		[Switch]: [{ push: 'id' }],
 		[Case]: {
 			...QUEST_ENTRIES,
@@ -296,7 +296,7 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 		sorting_id: Opt(NumberNode({ integer: true })),
 		daily_quest: Opt(BooleanNode()),
 		visibility: Opt(StringNode({ enum: ['DEFAULT', 'ALWAYS', 'NEVER'] })),
-		type: StringNode({ enum: Object.keys(QUEST_TYPES) }),
+		type: StringNode({ enum: Object.keys(QUEST_TYPES).concat(Object.keys(ADDITIONAL_QUESTS)) }),
 		[Switch]: [{ push: 'type' }],
 		[Case]: {
 			...QUEST_TYPES,
