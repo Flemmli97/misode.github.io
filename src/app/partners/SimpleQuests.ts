@@ -274,7 +274,7 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 
 	const TIME = StringNode({ validator: "regex_pattern", params: { 0: "[0-9]" } })
 	TIME.validate = (path, value, err, _) => {
-		if (NUM.test(value))
+		if (NUM.test(value) || value === '-1')
 			return parseInt(value)
 		if (!DATE.test(value))
 			err.add(path, "error.invalid.value.time")
