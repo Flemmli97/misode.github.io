@@ -246,16 +246,16 @@ export function initRunecraftory(_version: VersionId, schemas: SchemaRegistry, c
 	const ConversationContexts = [
 		`${ID}:greeting`,
 		`${ID}:talk`,
-		// `${ID}:follow_yes`,
-		// `${ID}:follow_no`,
-		// `${ID}:follow_stop`,
-		// `${ID}:dating_accept`,
-		// `${ID}:dating_deny`,
-		// `${ID}:marriage_accept`,
-		// `${ID}:marriage_deny`,
-		// `${ID}:divorce`,
-		// `${ID}:divorce_error`,
-		// `${ID}:procreation_cooldown`,
+		`${ID}:follow_yes`,
+		`${ID}:follow_no`,
+		`${ID}:follow_stop`,
+		`${ID}:dating_accept`,
+		`${ID}:dating_deny`,
+		`${ID}:marriage_accept`,
+		`${ID}:marriage_deny`,
+		`${ID}:divorce`,
+		`${ID}:divorce_error`,
+		`${ID}:procreation_cooldown`,
 	]
 
 	schemas.register(`${ID}:npc_data`, ObjectNode({
