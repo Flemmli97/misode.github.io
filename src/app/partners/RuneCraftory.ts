@@ -1,5 +1,5 @@
 import type { CollectionRegistry, NestedNodeChildren, SchemaRegistry } from '@mcschema/core'
-import { BooleanNode, Case, ChoiceNode, ListNode, MapNode, Mod, NumberNode, ObjectNode, Opt, Reference as RawReference, StringNode as RawStringNode, Switch } from '@mcschema/core'
+import { BooleanNode, Case, ListNode, MapNode, Mod, NumberNode, ObjectNode, Opt, Reference as RawReference, StringNode as RawStringNode, Switch } from '@mcschema/core'
 import { VersionId } from '../services/Schemas.js'
 import { addAdditionalQuestEntries, addAdditionalQuestTypes } from './SimpleQuests.js'
 
@@ -91,16 +91,18 @@ export function initRunecraftory(_version: VersionId, schemas: SchemaRegistry, c
 		tier1Spell: Opt(StringNode({ validator: 'resource', params: { pool: `${ID}:spells` as any } })),
 		tier2Spell: Opt(StringNode({ validator: 'resource', params: { pool: `${ID}:spells` as any } })),
 		tier3Spell: Opt(StringNode({ validator: 'resource', params: { pool: `${ID}:spells` as any } })),
+		armorEffect: Opt(StringNode({ validator: 'resource', params: { pool: `${ID}:armor_effects` as any } })),
 	}, { context: `${ID}.item_stats` }))
 
 	schemas.register(`${ID}:gate_spawning`, ObjectNode({
 		entity: StringNode({ validator: 'resource', params: { pool: 'item', allowTag: true } }),
 		minDistanceFromSpawn: NumberNode({ integer: true, min: 0 }),
 		minGateLevel: NumberNode({ integer: true, min: 0 }),
-		canSpawnInWater: BooleanNode(),
+		allowUnderwater: BooleanNode(),
 		biomes: MapNode(StringNode({ validator: 'resource', params: { pool: '$worldgen/biome', allowTag: true } }), NumberNode({ integer: false, min: 1 })),
 		structures: MapNode(StringNode({ validator: 'resource', params: { pool: '$worldgen/structure', allowTag: true } }), NumberNode({ integer: false, min: 1 })),
 		gatePredicate: Opt(Reference('entity_predicate')),
+		playerPredicate: Opt(Reference('entity_predicate')),
 	}, { context: `${ID}.gate_spawning` }))
 
 	// All currrently registered npc actions
@@ -219,45 +221,42 @@ export function initRunecraftory(_version: VersionId, schemas: SchemaRegistry, c
 		}))
 	}, { context: `${ID}.conversations` }))
 
-	const LookFeature = ChoiceNode([
-		{
-			type: 'type',
-			node: StringNode({ enum: ['SLIM_MODEL'] }),
-			change: (_v: unknown) => {
-				return ""
-			},
+	const LookFeatures: NestedNodeChildren = {
+		[`${ID}:slim_feature`]: {
 		},
-		{
-			type: 'feature',
-			priority: -1,
-			node: ObjectNode({
-				id: StringNode({ validator: 'resource', params: { pool: [], allowUnknown: true }, }), // If look features are added, add them here. atm none
-				value: StringNode({ validator: 'resource', params: { pool: [], allowUnknown: true }, })
-			}, { context: "look_features" }),
-			match: (v) => {
-				var _a
-				const type = (_a = v === null || v === void 0 ? void 0 : v.type) === null || _a === void 0 ? void 0 : _a
-				if (type == 'feature')
-					return true
-				return false
-			},
-			change: (_v: unknown) => {
-				return ({
-					type: "feature",
-					id: "",
-					value: ""
-				})
-			},
+		[`${ID}:size_feature`]: {
+			size: Reference('number_provider'),
 		},
-	], { choiceContext: `${ID}.look_features` })
+	}
 
 	schemas.register(`${ID}:npc_looks`, ObjectNode({
 		gender: Mod(StringNode({ enum: ['UNDEFINED', 'MALE', 'FEMALE'] }), { default: () => ('UNDEFINED') }),
 		texture: Opt(StringNode({ validator: 'resource', params: { pool: [], allowUnknown: true }, })),
-		playerSkin: Opt(StringNode({ validator: 'resource', params: { pool: [], allowUnknown: true }, })),
+		playerSkin: Opt(StringNode()),
 		weight: NumberNode({ integer: true, min: 0 }),
-		additionalFeatures: ListNode(LookFeature),
+		additionalFeatures: ListNode(ObjectNode({
+			type: StringNode({ enum: Object.keys(LookFeatures) }),
+			[Switch]: [{ push: 'type' }],
+			[Case]: {
+				...LookFeatures,
+			}
+		}))
 	}, { context: `${ID}.npc_looks` }))
+
+	const ConversationContexts = [
+		`${ID}:greeting`,
+		`${ID}:talk`,
+		// `${ID}:follow_yes`,
+		// `${ID}:follow_no`,
+		// `${ID}:follow_stop`,
+		// `${ID}:dating_accept`,
+		// `${ID}:dating_deny`,
+		// `${ID}:marriage_accept`,
+		// `${ID}:marriage_deny`,
+		// `${ID}:divorce`,
+		// `${ID}:divorce_error`,
+		// `${ID}:procreation_cooldown`,
+	]
 
 	schemas.register(`${ID}:npc_data`, ObjectNode({
 		name: Opt(StringNode()),
@@ -271,14 +270,15 @@ export function initRunecraftory(_version: VersionId, schemas: SchemaRegistry, c
 		})),
 		weight: NumberNode({ integer: true, min: 1 }),
 		neutralGiftResponse: StringNode(),
-		interactions: Mod(MapNode(StringNode({ enum: ['GREETING', 'TALK', 'FOLLOWYES', 'FOLLOWNO', 'FOLLOWSTOP'] }), StringNode({ validator: 'resource', params: { pool: [], allowUnknown: true }, })), {
-			default: () => ({
-				'GREETING': {},
-				'TALK': {},
-				'FOLLOWYES': {},
-				'FOLLOWNO': {},
-				'FOLLOWSTOP': {},
-			})
+		//TODO
+		interactions: Mod(MapNode(StringNode({ enum: ConversationContexts }), StringNode({ validator: 'resource', params: { pool: [], allowUnknown: true }, })), {
+			validate: (path, value, err, _) => {
+				let arr: string[] | undefined = value === undefined ? undefined : Object.keys(value);
+				if (!arr || !ConversationContexts.every((val,_)=> arr!.includes(val))) {
+					err.add(path, `${ID}.error.missing.contexts`)
+				}
+				return value
+			}
 		}),
 		questHandler: ObjectNode({
 			responses: MapNode(StringNode({ validator: 'resource', params: { pool: [], allowUnknown: true }, }), ObjectNode({
@@ -311,8 +311,11 @@ export function initRunecraftory(_version: VersionId, schemas: SchemaRegistry, c
 			baseLevel: NumberNode({ integer: true, min: 1 }),
 			combatActions: Opt(StringNode({ validator: 'resource', params: { pool: [], allowUnknown: true }, })),
 		})),
-		unique: Opt(NumberNode({ integer: true, min: 1 })),
-		relationShipState: Mod(StringNode({ enum: ['DEFAULT', 'NON_ROMANCEABLE', 'NO_ROMANCE_NPC', 'NO_ROMANCE'] }), { default: () => ('DEFAULT') })
+		unique: Opt(NumberNode({ integer: true, min: 0 })),
+		relation: ObjectNode({
+			relationShipState: Mod(StringNode({ enum: ['DEFAULT', 'NON_ROMANCEABLE', 'NO_ROMANCE_NPC', 'NO_ROMANCE'] }), { default: () => ('DEFAULT') }),
+			possibleChildren: Opt(ListNode(StringNode({ validator: 'resource', params: { pool: [], allowUnknown: true }, }))),
+		}),
 	}, { context: `${ID}.npc_data` }))
 
 	addAdditionalQuestTypes({
@@ -394,7 +397,6 @@ function register_collections(collections: CollectionRegistry) {
 	]
 	collections.register('attribute', attributes)
 
-	// spells TODO
 	collections.register(`${ID}:spells`, [
 		`${ID}:empty_spell`,
 		`${ID}:base_staff_spell`,
@@ -507,6 +509,10 @@ function register_collections(collections: CollectionRegistry) {
 		`${ID}:rafflesia_cicle`,
 		`${ID}:wind_circle_x8`,
 		`${ID}:wind_circle_x16`,
+	])
+
+	collections.register(`${ID}:armor_effects`, [
+		`${ID}:piyo_sandals`,
 	])
 
 	// All npc professions
