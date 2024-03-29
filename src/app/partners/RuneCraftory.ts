@@ -270,7 +270,6 @@ export function initRunecraftory(_version: VersionId, schemas: SchemaRegistry, c
 		})),
 		weight: NumberNode({ integer: true, min: 1 }),
 		neutralGiftResponse: StringNode(),
-		//TODO
 		interactions: Mod(MapNode(StringNode({ enum: ConversationContexts }), StringNode({ validator: 'resource', params: { pool: [], allowUnknown: true }, })), {
 			validate: (path, value, err, _) => {
 				let arr: string[] | undefined = value === undefined ? undefined : Object.keys(value);
