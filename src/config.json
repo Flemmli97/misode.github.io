@@ -2,61 +2,75 @@
   "languages": [
     {
       "code": "de",
-      "name": "Deutsch"
+      "name": "Deutsch",
+      "mc": "de_de"
     },
     {
       "code": "en",
-      "name": "English"
+      "name": "English",
+      "mc": "en_us"
     },
     {
       "code": "es",
-      "name": "Español"
+      "name": "Español",
+      "mc": "es_es"
     },
     {
       "code": "fr",
-      "name": "Français"
+      "name": "Français",
+      "mc": "fr_fr"
     },
     {
       "code": "it",
-      "name": "Italiano"
+      "name": "Italiano",
+      "mc": "it_it"
     },
     {
       "code": "ja",
-      "name": "日本語"
+      "name": "日本語",
+      "mc": "ja_jp"
     },
     {
       "code": "ko",
       "name": "한국어",
+      "mc": "ko_kr",
       "schemas": false
     },
     {
       "code": "pl",
-      "name": "Polski"
+      "name": "Polski",
+      "mc": "pl_pl"
     },
     {
       "code": "pt",
-      "name": "Português"
+      "name": "Português",
+      "mc": "pt_pt"
     },
     {
       "code": "ru",
-      "name": "Русский"
+      "name": "Русский",
+      "mc": "ru_ru"
     },
     {
       "code": "sk",
       "name": "Slovenčina",
+      "mc": "sk_sk",
       "schemas": false
     },
     {
       "code": "tr",
-      "name": "Türkçe"
+      "name": "Türkçe",
+      "mc": "tr_tr"
     },
     {
       "code": "zh-cn",
-      "name": "简体中文"
+      "name": "简体中文",
+      "mc": "zh_cn"
     },
     {
       "code": "zh-tw",
-      "name": "正體中文"
+      "name": "正體中文",
+      "mc": "zh_hk"
     }
   ],
   "versions": [
@@ -127,9 +141,16 @@
     },
     {
       "id": "1.20.3",
-      "ref": "1.20.3",
+      "ref": "1.20.4",
       "name": "1.20.3 — 1.20.4",
       "pack_format": 26,
+      "show": true
+    },
+    {
+      "id": "1.20.5",
+      "ref": "1.20.6",
+      "name": "1.20.5 — 1.20.6",
+      "pack_format": 41,
       "show": true
     }
   ],
@@ -188,7 +209,8 @@
       "id": "chat_type",
       "url": "chat-type",
       "schema": "chat_type",
-      "minVersion": "1.19"
+      "minVersion": "1.19",
+      "wiki": "https://minecraft.wiki/w/Chat_type"
     },
     {
       "id": "trim_material",
@@ -201,6 +223,18 @@
       "url": "trim-pattern",
       "schema": "trim_pattern",
       "minVersion": "1.19.4"
+    },
+    {
+      "id": "banner_pattern",
+      "url": "banner-pattern",
+      "schema": "banner_pattern",
+      "minVersion": "1.20.5"
+    },
+    {
+      "id": "wolf_variant",
+      "url": "wolf-variant",
+      "schema": "wolf_variant",
+      "minVersion": "1.20.5"
     },
     {
       "id": "pack_mcmeta",
@@ -488,7 +522,7 @@
     },
     {
       "id": "tag/point_of_interest_type",
-      "url": "tags/painting-variant",
+      "url": "tags/point-of-interest-type",
       "tags": ["tags"],
       "path": "tags/point_of_interest_type",
       "schema": "point_of_interest_type_tag",
