@@ -31,8 +31,9 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 	const Reference = RawReference.bind(undefined, schemas)
 	const StringNode = RawStringNode.bind(undefined, collections)
 
+	const stack_id_key = version < "1.20.5" ? "item" : "id"
 	const ItemStack = ObjectNode({
-		item: StringNode({ validator: 'resource', params: { pool: 'item' } }),
+		[stack_id_key]: StringNode({ validator: 'resource', params: { pool: 'item' } }),
 		count: Opt(NumberNode({ integer: true, min: 1 })),
 		tag: Opt(StringNode({ validator: 'nbt_path' }))
 	}, { context: `${ID}.itemstack` })
@@ -83,8 +84,10 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 	}
 
 	const DescriptiveList = (node: INode) => {
-		node.description = StringNode()
-		return ListNode(node, { minLength: 1 })
+		return ListNode(ObjectNode({
+			description: StringNode(),
+			value: node
+		}), { minLength: 1 })
 	}
 
 	const BlockPos = ObjectNode({
