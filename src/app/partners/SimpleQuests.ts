@@ -1,5 +1,5 @@
 import type { CollectionRegistry, INode, NestedNodeChildren, SchemaRegistry } from '@mcschema/core'
-import { BooleanNode, Case, ChoiceNode, ListNode, MapNode, NumberNode, ObjectNode, Opt, Reference as RawReference, StringNode as RawStringNode, Switch } from '@mcschema/core'
+import { BooleanNode, Case, ChoiceNode, ListNode, MapNode, Mod, NumberNode, ObjectNode, Opt, Reference as RawReference, StringNode as RawStringNode, Switch } from '@mcschema/core'
 import { VersionId } from '../services/Schemas.js'
 
 const ID = 'simplequests'
@@ -12,17 +12,17 @@ const DATE = new RegExp("^(?:(?<weeks>[0-9]{1,2})w)?" +
 	"(?:(?:^|:)(?<minutes>[0-9]{1,2})m)?" +
 	"(?:(?:^|:)(?<seconds>[0-9]{1,2})s)?$")
 
-const ADDITIONAL_QUESTS: NestedNodeChildren = {};
-const ADDITIONAL_QUEST_ENTRIES: NestedNodeChildren = {};
+const ADDITIONAL_QUESTS: NestedNodeChildren = {}
+const ADDITIONAL_QUEST_ENTRIES: NestedNodeChildren = {}
 
 export const addAdditionalQuestTypes = (add: NestedNodeChildren) => {
-	Object.entries(add).forEach(v=> {
+	Object.entries(add).forEach(v => {
 		ADDITIONAL_QUESTS[v[0]] = v[1]
 	})
 }
 
 export const addAdditionalQuestEntries = (add: NestedNodeChildren) => {
-	Object.entries(add).forEach(v=> {
+	Object.entries(add).forEach(v => {
 		ADDITIONAL_QUEST_ENTRIES[v[0]] = v[1]
 	})
 }
@@ -96,8 +96,51 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 		z: NumberNode({ integer: true })
 	})
 
+	const ObjectWithType = (choices: any, context: any, cases: { [x: string]: { [x: string]: any } }) => {
+		let pool = [
+			...collections.get("loot_number_provider_type"),
+			...Object.keys(cases)
+		]
+		const provider = ObjectNode({
+            type: Mod(Opt(StringNode({ enum: pool })), {
+                hidden: () => true
+            }),
+            [Switch]: [{ push: 'type' }],
+            [Case]: cases,
+        }, { context });
+        Object.keys(cases).forEach(k => {
+            choices.push({
+                type: k,
+                match: (v: { type?: any } | null | undefined) => {
+                    var _a;
+					console.log("aaa ", v);
+                    const type = ((_a = v === null || v === void 0 ? void 0 : v.type) === null || _a === void 0 ? void 0 : _a.replace(/^minecraft:/, ''));
+					if (type === k || 'minecraft:' + type === k)
+                        return true;
+                    const keys = v ? Object.keys(v) : [];
+                    let t = typeof v === 'object' && ((keys === null || keys === void 0 ? void 0 : keys.length) === 0 || ((keys === null || keys === void 0 ? void 0 : keys.length) === 1 && (keys === null || keys === void 0 ? void 0 : keys[0]) === 'type'));
+					return t;
+                },
+                node: provider,
+                change: (_v: any) => ({ type: k, v: 0 }) // Having just type seems to not update
+            });
+        });
+        return ChoiceNode(choices, { context, choiceContext: `number_provider.type` });
+    };
+
+	// Attempts to get the nodes from vanilla providers.
+	// IDK if there is an easy way to extend existing vanilla schemas
+	const choices = fetchFromSchema(schemas, "number_provider", d => d.choices);
+	schemas.register(`${ID}:number_provider`, ObjectWithType(choices, 'number_provider', {
+        'simplequests:context_multiplier': {
+            base: Reference('number_provider'),
+            multiplier: NumberNode(),
+            max: Opt(NumberNode())
+		}
+    }))
+
 	let playerPredicate_updated = Opt(Reference('entity_predicate'))
-	playerPredicate_updated.enabled = (_p) => version == "1.18.2" || version == "1.20.2"
+	playerPredicate_updated.enabled = (_p) => version == "1.18.2" || version >= "1.20.1"
 
 	//Quest-entry types
 	const QUEST_ENTRIES: NestedNodeChildren = {
@@ -111,7 +154,7 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 		[modidPrefix("multi_item")]: {
 			predicate: DescriptiveListOpt(() => Reference('item_predicate')),
 			description: StringNode(),
-			amount: Reference('number_provider'),
+			amount: Reference(`${ID}:number_provider`),
 			consumeItems: BooleanNode(),
 			playerPredicate: playerPredicate_updated,
 		},
@@ -124,7 +167,7 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 		[modidPrefix("multi_kill")]: {
 			predicate: DescriptiveListOpt(() => Reference('entity_predicate')),
 			description: StringNode(),
-			amount: Reference('number_provider'),
+			amount: Reference(`${ID}:number_provider`),
 			playerPredicate: playerPredicate_updated,
 		},
 		[modidPrefix("xp")]: {
@@ -132,7 +175,7 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 			playerPredicate: playerPredicate_updated,
 		},
 		[modidPrefix("multi_xp")]: {
-			amount: Reference('number_provider'),
+			amount: Reference(`${ID}:number_provider`),
 			description: StringNode(),
 			playerPredicate: playerPredicate_updated,
 		},
@@ -184,7 +227,7 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 			taskDescription: StringNode(),
 			itemPredicates: Opt(DescriptiveList(Reference('item_predicate'))),
 			entityPredicates: Opt(DescriptiveList(Reference('entity_predicate'))),
-			amount: Reference('number_provider'),
+			amount: Reference(`${ID}:number_provider`),
 			consume: BooleanNode(),
 			playerPredicate: playerPredicate_updated,
 		},
@@ -204,7 +247,7 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 			taskDescription: StringNode(),
 			itemPredicates: Opt(DescriptiveList(Reference('item_predicate'))),
 			blockPredicates: Opt(DescriptiveList(Reference('block_predicate'))),
-			amount: Reference('number_provider'),
+			amount: Reference(`${ID}:number_provider`),
 			use: BooleanNode(),
 			consumeItem: BooleanNode(),
 			playerPredicate: playerPredicate_updated,
@@ -223,7 +266,7 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 
 			item: DescriptiveList(Reference('item_predicate')),
 			playerPredicate: Opt(DescriptiveList(Reference('entity_predicate'))),
-			amount: Reference('number_provider'),
+			amount: Reference(`${ID}:number_provider`),
 		},
 		[modidPrefix("fishing")]: {
 			description: StringNode(),
@@ -239,7 +282,7 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 
 			item: DescriptiveList(Reference('item_predicate')),
 			playerPredicate: Opt(DescriptiveList(Reference('entity_predicate'))),
-			amount: Reference('number_provider'),
+			amount: Reference(`${ID}:number_provider`),
 		},
 		[`${ID}:npc_quest`]: {
 			npc: Reference('item_predicate'),
@@ -308,10 +351,21 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 	}, { context: `${ID}.quest` }))
 }
 
-function modidPrefix(name: string, list?: string[]) {
+function modidPrefix(name: string, list?: string[]): string {
 	var id = ID + ':' + name
 	if (list) {
 		list.push(id)
 	}
 	return id
+}
+
+function fetchFromSchema(schemas: SchemaRegistry, id: string, getter: (data: any) => any): any {
+	const hook: any = schemas.get(id).hook
+	let value;
+	hook({ 
+		base: {
+			call: (_hook: any, data: any) => value = data
+		}
+	}, undefined);
+	return getter(value)
 }

@@ -342,7 +342,6 @@
   "simplequests.quest.type.runecraftory:quest_board_quest": "Questboard Quest (RuneCraftory)",
   "simplequests.quest.runecraftory:quest_board_quest.wrappedQuest": "Quest",
   "simplequests.quest.runecraftory:quest_board_quest.wrappedQuest.help": "ID of the actual quest. Idealy the quest should not be acceptable via normal means (e.g. set needs_unlock to true)",
-
   "simplequests.itemstack.item": "Item",
   "simplequests.itemstack.count": "Count",
   "simplequests.itemstack.tag": "NBT Tag",
@@ -413,5 +412,9 @@
   "simplequests.quest_entries.use.help": "If true needs to right click the block. Else needs to mine the block",
   "simplequests.quest_entries.consumeItem": "Consume items",
   "simplequests.quest_entries.playerPredicate": "Player Predicates",
+  "simplequests:context_multiplier": "Quest Multiplier",
+  "number_provider.simplequests:context_multiplier.base": "Base Amount",
+  "number_provider.simplequests:context_multiplier.multiplier": "Multiplier",
+  "number_provider.simplequests:context_multiplier.max": "Max",
   "error.invalid.value.time": "Invalid time format"
 }
