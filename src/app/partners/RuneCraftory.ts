@@ -163,46 +163,42 @@ export function initRunecraftory(_version: VersionId, schemas: SchemaRegistry, c
 		})),
 	}, { context: `${ID}.npc_actions` }))
 
-	// Need access to ConditionCases in common
-	// Also dynamic imports do not work... so we just pull 1.18.2
-	import('@mcschema/java-1.18.2/lib/schemas/Common.js').then(common => {
-		let conditions = collections.get('loot_condition_type')
-		conditions = conditions.concat([`${ID}:biome`, `${ID}:friend_points`, `${ID}:interacting_player`, `${ID}:season`, `${ID}:skill_check`, `${ID}:talk_count`])
-		// It would be nice if one can add on to the existing loot condition schema but that seems not possible
-		// Thus we create a custom collection + schema
-		common.initCommonSchemas(schemas, collections)
-		schemas.register(`${ID}:loot_condition`, Mod(ObjectNode({
-			loot_condition_type: StringNode({ enum: conditions }),
-			[Switch]: [{ push: 'loot_condition_type' }],
-			[Case]: {
-				...common.ConditionCases(StringNode()),
-				[`${ID}:biome`]: {
-					biome_tag: StringNode({ validator: 'resource', params: { pool: '$tag/worldgen/biome' } })
-				},
-				[`${ID}:friend_points`]: {
-					points: NumberNode({ integer: true, min: 0 })
-				},
-				[`${ID}:interacting_player`]: {
-					relation: StringNode({ enum: ['NORMAL', 'DATING', 'MARRIED'] })
-				},
-				[`${ID}:season`]: {
-					season: StringNode({ enum: ['SPRING', 'SUMMER', 'FALL', 'WINTER'] })
-				},
-				[`${ID}:skill_check`]: {
-					skill: StringNode({ enum: SKILLS }),
-					min_required_level: NumberNode({ integer: true, min: 0 })
-				},
-				[`${ID}:talk_count`]: {
-					count: NumberNode({ integer: true, min: 0 })
-				},
-			}
-		}, { category: 'predicate', context: `condition` }), {
-			default: () => ({
-				loot_condition_type: 'minecraft:random_chance',
-				chance: 0.5
-			}),
-		}))
-	})
+	const CONDITION_TYPES = [
+		...collections.get('loot_condition_type'),
+		...[`${ID}:biome`, `${ID}:friend_points`, `${ID}:interacting_player`, `${ID}:season`, `${ID}:skill_check`, `${ID}:talk_count`]
+	]
+	const VANILLA_CONDITION = fetchFromSchema(schemas, "loot_condition", d => d.cases);
+	schemas.register(`${ID}:loot_condition`, Mod(ObjectNode({
+		loot_condition_type: StringNode({ enum: CONDITION_TYPES }),
+		[Switch]: [{ push: 'loot_condition_type' }],
+		[Case]: {
+			...VANILLA_CONDITION,
+			[`${ID}:biome`]: {
+				biome_tag: StringNode({ validator: 'resource', params: { pool: '$tag/worldgen/biome' } })
+			},
+			[`${ID}:friend_points`]: {
+				points: NumberNode({ integer: true, min: 0 })
+			},
+			[`${ID}:interacting_player`]: {
+				relation: StringNode({ enum: ['NORMAL', 'DATING', 'MARRIED'] })
+			},
+			[`${ID}:season`]: {
+				season: StringNode({ enum: ['SPRING', 'SUMMER', 'FALL', 'WINTER'] })
+			},
+			[`${ID}:skill_check`]: {
+				skill: StringNode({ enum: SKILLS }),
+				min_required_level: NumberNode({ integer: true, min: 0 })
+			},
+			[`${ID}:talk_count`]: {
+				count: NumberNode({ integer: true, min: 0 })
+			},
+		}
+	}, { category: 'predicate', context: `condition` }), {
+		default: () => ({
+			loot_condition_type: 'minecraft:random_chance',
+			chance: 0.5
+		}),
+	}))
 
 	schemas.register(`${ID}:conversations`, ObjectNode({
 		fallbackKey: StringNode(),
@@ -527,4 +523,15 @@ function register_collections(collections: CollectionRegistry) {
 		`${ID}:bath_house`,
 		`${ID}:random`,
 	])
+}
+
+function fetchFromSchema(schemas: SchemaRegistry, id: string, getter: (data: any) => any): any {
+	const hook: any = schemas.get(id).hook
+	let value;
+	hook({ 
+		base: {
+			call: (_hook: any, data: any) => value = data
+		}
+	}, undefined);
+	return getter(value)
 }
