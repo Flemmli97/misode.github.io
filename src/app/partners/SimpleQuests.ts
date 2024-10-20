@@ -31,7 +31,8 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 	const Reference = RawReference.bind(undefined, schemas)
 	const StringNode = RawStringNode.bind(undefined, collections)
 
-	const stack_id_key = version < "1.20.5" ? "item" : "id"
+	const mVer = modVersion(version)
+	const stack_id_key = mVer < 2 ? "item" : "id"
 	const ItemStack = ObjectNode({
 		[stack_id_key]: StringNode({ validator: 'resource', params: { pool: 'item' } }),
 		count: Opt(NumberNode({ integer: true, min: 1 })),
@@ -42,11 +43,13 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 		name: StringNode(),
 		description: Opt(ListNode(StringNode())),
 		icon: Opt(ItemStack),
-		max_concurrent_quests: Opt(NumberNode({ integer: true })),
 		only_same_category: Opt(BooleanNode()),
+		max_concurrent_quests: Opt(NumberNode({ integer: true })),
 		sorting_id: Opt(NumberNode({ integer: true })),
+		max_daily: Opt(NumberNode({ integer: true })),
 		selectable: Opt(BooleanNode()),
 		is_visible: Opt(BooleanNode()),
+		is_silent: Opt(BooleanNode()),
 	}, { context: `${ID}.quest_category` }))
 
 	const DescriptiveListOpt = (node: () => INode) => {
@@ -152,7 +155,7 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 			playerPredicate: playerPredicate_updated,
 		},
 		[modidPrefix("multi_item")]: {
-			predicate: DescriptiveListOpt(() => Reference('item_predicate')),
+			predicates: DescriptiveListOpt(() => Reference('item_predicate')),
 			description: StringNode(),
 			amount: Reference(`${ID}:number_provider`),
 			consumeItems: BooleanNode(),
@@ -165,7 +168,7 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 			playerPredicate: playerPredicate_updated,
 		},
 		[modidPrefix("multi_kill")]: {
-			predicate: DescriptiveListOpt(() => Reference('entity_predicate')),
+			predicates: DescriptiveListOpt(() => Reference('entity_predicate')),
 			description: StringNode(),
 			amount: Reference(`${ID}:number_provider`),
 			playerPredicate: playerPredicate_updated,
@@ -185,7 +188,7 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 			playerPredicate: playerPredicate_updated,
 		},
 		[modidPrefix("multi_advancements")]: {
-			advancement: ListNode(StringNode({ validator: 'resource', params: { pool: "$advancement" } }), { minLength: 1 }),
+			advancements: ListNode(StringNode({ validator: 'resource', params: { pool: "$advancement" } }), { minLength: 1 }),
 			description: StringNode(),
 			reset: BooleanNode(),
 			playerPredicate: playerPredicate_updated,
@@ -197,7 +200,7 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 			playerPredicate: playerPredicate_updated,
 		},
 		[modidPrefix("multi_position")]: {
-			pos: DescriptiveListOpt(() => BlockPos),
+			positions: DescriptiveListOpt(() => BlockPos),
 			minDist: NumberNode({ min: 0, integer: true }),
 			description: Opt(StringNode()),
 			playerPredicate: playerPredicate_updated,
@@ -208,7 +211,7 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 			playerPredicate: playerPredicate_updated,
 		},
 		[modidPrefix("multi_location")]: {
-			predicate: DescriptiveList(Reference('location_predicate')),
+			locations: DescriptiveList(Reference('location_predicate')),
 			description: StringNode(),
 			playerPredicate: playerPredicate_updated,
 		},
@@ -264,8 +267,8 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 			description: StringNode(),
 			taskDescription: StringNode(),
 
-			item: DescriptiveList(Reference('item_predicate')),
-			playerPredicate: Opt(DescriptiveList(Reference('entity_predicate'))),
+			itemPredicates: DescriptiveList(Reference('item_predicate')),
+			entityPredicates: Opt(DescriptiveList(Reference('entity_predicate'))),
 			amount: Reference(`${ID}:number_provider`),
 		},
 		[modidPrefix("fishing")]: {
@@ -280,15 +283,9 @@ export function initSimpleQuests(version: VersionId, schemas: SchemaRegistry, co
 			description: StringNode(),
 			taskDescription: StringNode(),
 
-			item: DescriptiveList(Reference('item_predicate')),
-			playerPredicate: Opt(DescriptiveList(Reference('entity_predicate'))),
+			itemPredicates: DescriptiveList(Reference('item_predicate')),
+			entityPredicates: Opt(DescriptiveList(Reference('entity_predicate'))),
 			amount: Reference(`${ID}:number_provider`),
-		},
-		[`${ID}:npc_quest`]: {
-			npc: Reference('item_predicate'),
-			description: Opt(StringNode()),
-			amount: NumberNode({ integer: true, min: 1 }),
-			consumeItems: BooleanNode(),
 		}
 	}
 
@@ -368,4 +365,12 @@ function fetchFromSchema(schemas: SchemaRegistry, id: string, getter: (data: any
 		}
 	}, undefined);
 	return getter(value)
+}
+
+function modVersion(version: VersionId) {
+	if (version < "1.20.5") {
+		return 1 // icon field changed from "item" to "id"
+	} else  {
+		return 2
+	}
 }
