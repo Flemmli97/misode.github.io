@@ -1,14 +1,17 @@
 import type { DataModel } from '@mcschema/core'
 import { Path } from '@mcschema/core'
 import * as zip from '@zip.js/zip.js'
-import type { Random } from 'deepslate'
-import { Matrix3, Matrix4, Vector } from 'deepslate'
+import type { Identifier, NbtTag, Random } from 'deepslate'
+import { Matrix3, Matrix4, NbtByte, NbtCompound, NbtDouble, NbtInt, NbtList, NbtString, Vector } from 'deepslate'
 import type { mat3 } from 'gl-matrix'
 import { quat, vec2 } from 'gl-matrix'
 import yaml from 'js-yaml'
 import { route } from 'preact-router'
 import rfdc from 'rfdc'
+import type { ConfigGenerator } from './Config.js'
 import config from './Config.js'
+import type { VersionId } from './services/index.js'
+import { checkVersion } from './services/index.js'
 
 export function isPromise(obj: any): obj is Promise<any> {
 	return typeof (obj as any)?.then === 'function' 
@@ -559,6 +562,11 @@ export function parseGitPatch(patch: string) {
 	let after = 1
 	for (let i = 0; i < source.length; i += 1) {
 		const line = source[i]
+		if (line.startsWith('Index: ') || line.startsWith('===')
+			|| line.startsWith('---') || line.startsWith('+++')
+			|| line.startsWith('\\') || line.length === 0) {
+			continue
+		}
 		if (line.startsWith('@')) {
 			const match = line.match(/^@@ -(\d+)(?:,(?:\d+))? \+(\d+)(?:,(?:\d+))? @@/)
 			if (!match) throw new Error(`Invalid patch pattern at line ${i+1}: ${line}`)
@@ -575,9 +583,60 @@ export function parseGitPatch(patch: string) {
 		} else if (line.startsWith('-')) {
 			result.push({ line, before })
 			before += 1
-		} else if (!line.startsWith('\\')) {
-			throw new Error(`Invalid patch, got ${line.charAt(0)} at line ${i+1}`)
+		} else {
+			throw new Error(`Invalid patch, got '${line.charAt(0)}' at line ${i+1}`)
 		}
 	}
 	return result
+}
+
+const legacyFolders = new Set(['loot_table', 'predicate', 'item_modifier', 'advancement', 'recipe', 'tag/function', 'tag/item', 'tag/block', 'tag/fluid', 'tag/entity_type', 'tag/game_event'])
+export function genPath(gen: ConfigGenerator, version: VersionId) {
+	const path = gen.path ?? gen.id
+	if (!checkVersion(version, '1.21') && legacyFolders.has(gen.id)) {
+		return path + 's'
+	}
+	return path
+}
+
+export function jsonToNbt(value: unknown): NbtTag {
+	if (typeof value === 'string') {
+		return new NbtString(value)
+	}
+	if (typeof value === 'number') {
+		return Number.isInteger(value) ? new NbtInt(value) : new NbtDouble(value)
+	}
+	if (typeof value === 'boolean') {
+		return new NbtByte(value)
+	}
+	if (Array.isArray(value)) {
+		return new NbtList(value.map(jsonToNbt))
+	}
+	if (typeof value === 'object' && value !== null) {
+		return new NbtCompound(
+			new Map(Object.entries(value ?? {})
+				.map(([k, v]) => [k, jsonToNbt(v)]))
+		)
+	}
+	return new NbtByte(0)
+}
+
+export function mergeTextComponentStyles(text: unknown, style: Record<string, unknown>) {
+	if (typeof text === 'string') {
+		return { ...style, text }
+	}
+	if (Array.isArray(text)) {
+		return { ...style, ...text[0], extra: text.slice(1) }
+	}
+	if (typeof text === 'object' && text !== null) {
+		return { ...style, ...text }
+	}
+	return { ...style, text: '' }
+}
+
+export function makeDescriptionId(prefix: string, id: Identifier | undefined) {
+	if (id === undefined) {
+		return `${prefix}.unregistered_sadface`
+	}
+	return `${prefix}.${id.namespace}.${id.path.replaceAll('/', '.')}`
 }

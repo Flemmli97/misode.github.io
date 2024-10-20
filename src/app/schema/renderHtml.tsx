@@ -1,5 +1,5 @@
-import type { BooleanHookParams, EnumOption, Hook, INode, NodeChildren, NumberHookParams, StringHookParams, ValidationOption } from '@mcschema/core'
-import { DataModel, ListNode, MapNode, ModelPath, ObjectNode, Path, StringNode, relativePath } from '@mcschema/core'
+import type { BooleanHookParams, EnumOption, Hook, INode, ListHookParams, NodeChildren, NumberHookParams, StringHookParams, ValidationOption } from '@mcschema/core'
+import { DataModel, ListNode, MapNode, ModelPath, ObjectNode, Path, relativePath, StringNode } from '@mcschema/core'
 import { Identifier, ItemStack } from 'deepslate/core'
 import type { ComponentChildren, JSX } from 'preact'
 import { memo } from 'preact/compat'
@@ -12,14 +12,14 @@ import { VanillaColors } from '../components/previews/BiomeSourcePreview.jsx'
 import { localize, useLocale, useStore } from '../contexts/index.js'
 import { useFocus } from '../hooks/index.js'
 import type { BlockStateRegistry, VersionId } from '../services/index.js'
-import { CachedDecorator, CachedFeature } from '../services/index.js'
+import { CachedDecorator, CachedFeature, checkVersion } from '../services/index.js'
 import { ModelWrapper } from './ModelWrapper.js'
 
-const selectRegistries = ['loot_table.type', 'loot_entry.type', 'function.function', 'condition.condition', 'criterion.trigger', 'recipe.type', 'dimension.generator.type', 'dimension.generator.biome_source.type', 'dimension.generator.biome_source.preset', 'carver.type', 'feature.type', 'decorator.type', 'feature.tree.minimum_size.type', 'block_state_provider.type', 'trunk_placer.type', 'foliage_placer.type', 'tree_decorator.type', 'int_provider.type', 'float_provider.type', 'height_provider.type', 'structure_feature.type', 'surface_builder.type', 'processor.processor_type', 'rule_test.predicate_type', 'pos_rule_test.predicate_type', 'template_element.element_type', 'block_placer.type', 'block_predicate.type', 'material_rule.type', 'material_condition.type', 'structure_placement.type', 'density_function.type', 'root_placer.type', 'entity.type_specific.cat.variant', 'entity.type_specific.frog.variant', 'rule_block_entity_modifier.type', 'pool_alias_binding.type', 'lithostitched.worldgen_modifier.type', 'lithostitched.modifier_predicate.type', 'ohthetreesyoullgrow.configured_feature.type', 'enchantment_provider.type', 'enchantment_value_effect.type', 'level_based_value.type']
+const selectRegistries = ['loot_table.type', 'loot_entry.type', 'function.function', 'condition.condition', 'criterion.trigger', 'recipe.type', 'dimension.generator.type', 'dimension.generator.biome_source.type', 'dimension.generator.biome_source.preset', 'carver.type', 'feature.type', 'decorator.type', 'feature.tree.minimum_size.type', 'block_state_provider.type', 'trunk_placer.type', 'foliage_placer.type', 'tree_decorator.type', 'int_provider.type', 'float_provider.type', 'height_provider.type', 'structure_feature.type', 'surface_builder.type', 'processor.processor_type', 'rule_test.predicate_type', 'pos_rule_test.predicate_type', 'template_element.element_type', 'block_placer.type', 'block_predicate.type', 'material_rule.type', 'material_condition.type', 'structure_placement.type', 'density_function.type', 'root_placer.type', 'entity.type_specific.cat.variant', 'entity.type_specific.frog.variant', 'rule_block_entity_modifier.type', 'pool_alias_binding.type', 'lithostitched.worldgen_modifier.type', 'lithostitched.modifier_predicate.type', 'ohthetreesyoullgrow.configured_feature.type', 'enchantment_provider.type', 'enchantment_value_effect.type', 'level_based_value.type', 'neoforge.biome_modifier.type', 'neoforge.structure_modifier.type']
 const datalistEnums = ['item_stack.components', 'function.set_components.components']
 const hiddenFields = ['number_provider.type', 'score_provider.type', 'nbt_provider.type', 'int_provider.type', 'float_provider.type', 'height_provider.type', 'level_based_value.type']
 const flattenedFields = ['feature.config', 'decorator.config', 'int_provider.value', 'float_provider.value', 'block_state_provider.simple_state_provider.state', 'block_state_provider.rotated_block_provider.state', 'block_state_provider.weighted_state_provider.entries.entry.data', 'rule_test.block_state', 'structure_feature.config', 'surface_builder.config', 'template_pool.elements.entry.element', 'decorator.block_survives_filter.state', 'material_rule.block.result_state', 'enchantment.effects.entry.effect']
-const inlineFields = ['loot_entry.type', 'function.function', 'condition.condition', 'criterion.trigger', 'dimension.generator.type', 'dimension.generator.biome_source.type', 'feature.type', 'decorator.type', 'block_state_provider.type', 'feature.tree.minimum_size.type', 'trunk_placer.type', 'foliage_placer.type', 'tree_decorator.type', 'block_placer.type', 'rule_test.predicate_type', 'processor.processor_type', 'template_element.element_type', 'nbt_operation.op', 'number_provider.value', 'score_provider.name', 'score_provider.target', 'nbt_provider.source', 'nbt_provider.target', 'generator_biome.biome', 'block_predicate.type', 'material_rule.type', 'material_condition.type', 'density_function.type', 'root_placer.type', 'entity.type_specific.type', 'glyph_provider.type', 'sprite_source.type', 'rule_block_entity_modifier.type', 'immersive_weathering.area_condition.type', 'immersive_weathering.block_growth.growth_for_face.entry.direction', 'immersive_weathering.position_test.predicate_type', 'pool_alias_binding.type', 'item_stack.id', 'data_component.banner_patterns.entry.pattern', 'data_component.container.entry.slot', 'map_decoration.type', 'suspicious_stew_effect_instance.id', 'enchantment_value_effect.type', 'enchantment_effect.type', 'particle.type', 'condition.loot_condition_type']
+const inlineFields = ['loot_entry.type', 'function.function', 'condition.condition', 'criterion.trigger', 'dimension.generator.type', 'dimension.generator.biome_source.type', 'feature.type', 'decorator.type', 'block_state_provider.type', 'feature.tree.minimum_size.type', 'trunk_placer.type', 'foliage_placer.type', 'tree_decorator.type', 'block_placer.type', 'rule_test.predicate_type', 'processor.processor_type', 'template_element.element_type', 'nbt_operation.op', 'number_provider.value', 'score_provider.name', 'score_provider.target', 'nbt_provider.source', 'nbt_provider.target', 'generator_biome.biome', 'block_predicate.type', 'material_rule.type', 'material_condition.type', 'density_function.type', 'root_placer.type', 'entity.type_specific.type', 'glyph_provider.type', 'sprite_source.type', 'rule_block_entity_modifier.type', 'immersive_weathering.area_condition.type', 'immersive_weathering.block_growth.growth_for_face.entry.direction', 'immersive_weathering.position_test.predicate_type', 'pool_alias_binding.type', 'item_stack.id', 'data_component.container.entry.slot', 'map_decoration.type', 'suspicious_stew_effect_instance.id', 'enchantment_value_effect.type', 'enchantment_effect.type', 'particle.type', 'condition.loot_condition_type']
 const nbtFields = ['function.set_nbt.tag', 'advancement.display.icon.nbt', 'text_component_object.nbt', 'entity.nbt', 'block.nbt', 'item.nbt']
 const fixedLists = ['generator_biome.parameters.temperature', 'generator_biome.parameters.humidity', 'generator_biome.parameters.continentalness', 'generator_biome.parameters.erosion', 'generator_biome.parameters.depth', 'generator_biome.parameters.weirdness', 'feature.end_spike.crystal_beam_target', 'feature.end_gateway.exit', 'decorator.block_filter.offset', 'block_predicate.has_sturdy_face.offset', 'block_predicate.inside_world_bounds.offset', 'block_predicate.matching_block_tag.offset', 'block_predicate.matching_blocks.offset', 'block_predicate.matching_fluids.offset', 'block_predicate.would_survive.offset', 'model_element.from', 'model_element.to', 'model_element.rotation.origin', 'model_element.faces.uv', 'item_transform.rotation', 'item_transform.translation', 'item_transform.scale', 'generator_structure.random_spread.locate_offset', 'pack_overlay.formats', 'data_component.profile.id', 'data_component.lodestone_tracker.tracker.pos', 'attribute_modifier.uuid']
 const collapsedFields = ['noise_settings.surface_rule', 'noise_settings.noise.terrain_shaper']
@@ -94,10 +94,7 @@ const renderHtml: RenderHook = {
 		return [prefix, <>{inject}{suffix}</>, body]
 	},
 
-	list({ children, config }, path, value, lang, version, states, ctx) {
-		const { expand, collapse, isToggled } = useToggles()
-		const [maxShown, setMaxShown] = useState(50)
-
+	list({ children, config, node }, path, value, lang, version, states, ctx) {
 		const context = path.getContext().join('.')
 		if (fixedLists.includes(context)) {
 			const prefix = <>
@@ -117,87 +114,8 @@ const renderHtml: RenderHook = {
 			const node = DataModel.wrapLists(children.default())
 			path.model.set(path, [{ node, id: hexId() }, ...value])
 		}
-		const onAddBottom = () => {
-			if (!Array.isArray(value)) value = []
-			const node = DataModel.wrapLists(children.default())
-			path.model.set(path, [...value, { node, id: hexId() }])
-		}
 		const suffix = <button class="add tooltipped tip-se" aria-label={localize(lang, 'add_top')} onClick={onAdd}>{Octicon.plus_circle}</button>
-		const body = <>
-			{(value && Array.isArray(value)) && value.map(({ node: cValue, id: cId }, index) => {
-				if (index === maxShown) {
-					return <div class="node node-header">
-						<label>{localize(lang, 'entries_hidden', `${value.length - maxShown}`)}</label>
-						<button onClick={() => setMaxShown(Math.min(maxShown + 50, value.length))}>{localize(lang, 'entries_hidden.more', '50')}</button>
-						<button onClick={() => setMaxShown(value.length)}>{localize(lang, 'entries_hidden.all')}</button>
-					</div>
-				}
-				if (index > maxShown) {
-					return null
-				}
-				const pathWithContext = (config?.context) ? new ModelPath(path.getModel(), new Path(path.getArray(), [config.context])) : path
-				const cPath = pathWithContext.push(index).contextPush('entry')
-				const canToggle = children.type(cPath) === 'object'
-				const toggle = isToggled(cId)
-
-				let label: undefined | string | JSX.Element
-				if (itemPreviewFields.includes(cPath.getContext().join('.'))) {
-					if (isObject(cValue) && typeof cValue.type === 'string' && cValue.type.replace(/^minecraft:/, '') === 'item' && typeof cValue.name === 'string') {
-						let itemStack: ItemStack | undefined
-						try {
-							itemStack = new ItemStack(Identifier.parse(cValue.name), 1)
-						} catch (e) {}
-						if (itemStack !== undefined) {
-							label = <ItemDisplay item={itemStack} />
-						}
-					}
-				}
-
-				if (canToggle && (toggle === false || (toggle === undefined && value.length > 20))) {
-					return <div class="node node-header" data-category={children.category(cPath)}>
-						<ErrorPopup lang={lang} path={cPath} nested />
-						<button class="toggle tooltipped tip-se" aria-label={`${localize(lang, 'expand')}\n${localize(lang, 'expand_all', 'Ctrl')}`} onClick={expand(cId)}>{Octicon.chevron_right}</button>
-						<label>{label ?? pathLocale(lang, cPath, `${index}`)}</label>
-						<Collapsed key={cId} path={cPath} value={cValue} schema={children} />
-					</div>
-				}
-
-				const onRemove = () => cPath.set(undefined)
-				const onMoveUp = () => {
-					const v = [...path.get()];
-					[v[index - 1], v[index]] = [v[index], v[index - 1]]
-					path.model.set(path, v)
-				}
-				const onMoveDown = () => {
-					const v = [...path.get()];
-					[v[index + 1], v[index]] = [v[index], v[index + 1]]
-					path.model.set(path, v)
-				}
-				const actions: MenuAction[] = [
-					{
-						icon: 'duplicate',
-						label: 'duplicate',
-						onSelect: () => {
-							const v = [...path.get()]
-							v.splice(index, 0, { id: hexId(), node: deepClone(cValue) })
-							path.model.set(path, v)
-						},
-					},
-				]
-				return <MemoedTreeNode key={cId} label={label} path={cPath} schema={children} value={cValue} {...{lang, version, states, actions}} ctx={{...ctx, index: (index === 0 ? 1 : 0) + (index === value.length - 1 ? 2 : 0)}}>
-					{canToggle && <button class="toggle tooltipped tip-se" aria-label={`${localize(lang, 'collapse')}\n${localize(lang, 'collapse_all', 'Ctrl')}`} onClick={collapse(cId)}>{Octicon.chevron_down}</button>}
-					<button class="remove tooltipped tip-se" aria-label={localize(lang, 'remove')} onClick={onRemove}>{Octicon.trashcan}</button>
-					{value.length > 1 && <div class="node-move">
-						<button class="move tooltipped tip-se" aria-label={localize(lang, 'move_up')} onClick={onMoveUp} disabled={index === 0}>{Octicon.chevron_up}</button>
-						<button class="move tooltipped tip-se" aria-label={localize(lang, 'move_down')} onClick={onMoveDown} disabled={index === value.length - 1}>{Octicon.chevron_down}</button>
-					</div>}
-				</MemoedTreeNode>
-			})}
-			{(value && value.length > 0 && value.length <= maxShown) && <div class="node node-header">
-				<button class="add tooltipped tip-se" aria-label={localize(lang, 'add_bottom')} onClick={onAddBottom}>{Octicon.plus_circle}</button>
-			</div>}
-		</>
-		return [null, suffix, body]
+		return [null, suffix, <ListBody {...{children, config, node, path, value, lang, version, states, ctx}}/>]
 	},
 
 	map({ children, keys, config }, path, value, lang, version, states, ctx) {
@@ -386,6 +304,90 @@ function useToggles() {
 	return { expand, collapse, isToggled }
 }
 
+function ListBody({ path, value, lang, config, children, version, states, ctx }: NodeProps<ListHookParams>) {
+	const { expand, collapse, isToggled } = useToggles()
+	const [maxShown, setMaxShown] = useState(50)
+	const onAddBottom = () => {
+		if (!Array.isArray(value)) value = []
+		const node = DataModel.wrapLists(children.default())
+		path.model.set(path, [...value, { node, id: hexId() }])
+	}
+	return <>
+		{(value && Array.isArray(value)) && value.map(({ node: cValue, id: cId }, index) => {
+			if (index === maxShown) {
+				return <div class="node node-header">
+					<label>{localize(lang, 'entries_hidden', `${value.length - maxShown}`)}</label>
+					<button onClick={() => setMaxShown(Math.min(maxShown + 50, value.length))}>{localize(lang, 'entries_hidden.more', '50')}</button>
+					<button onClick={() => setMaxShown(value.length)}>{localize(lang, 'entries_hidden.all')}</button>
+				</div>
+			}
+			if (index > maxShown) {
+				return null
+			}
+			const pathWithContext = (config?.context) ? new ModelPath(path.getModel(), new Path(path.getArray(), [config.context])) : path
+			const cPath = pathWithContext.push(index).contextPush('entry')
+			const canToggle = children.type(cPath) === 'object'
+			const toggle = isToggled(cId)
+
+			let label: undefined | string | JSX.Element
+			if (itemPreviewFields.includes(cPath.getContext().join('.'))) {
+				if (isObject(cValue) && typeof cValue.type === 'string' && cValue.type.replace(/^minecraft:/, '') === 'item' && typeof cValue.name === 'string') {
+					let itemStack: ItemStack | undefined
+					try {
+						itemStack = new ItemStack(Identifier.parse(cValue.name), 1)
+					} catch (e) {}
+					if (itemStack !== undefined) {
+						label = <ItemDisplay item={itemStack} />
+					}
+				}
+			}
+
+			if (canToggle && (toggle === false || (toggle === undefined && value.length > 20))) {
+				return <div class="node node-header" data-category={children.category(cPath)}>
+					<ErrorPopup lang={lang} path={cPath} nested />
+					<button class="toggle tooltipped tip-se" aria-label={`${localize(lang, 'expand')}\n${localize(lang, 'expand_all', 'Ctrl')}`} onClick={expand(cId)}>{Octicon.chevron_right}</button>
+					<label>{label ?? pathLocale(lang, cPath, `${index}`)}</label>
+					<Collapsed key={cId} path={cPath} value={cValue} schema={children} />
+				</div>
+			}
+
+			const onRemove = () => cPath.set(undefined)
+			const onMoveUp = () => {
+				const v = [...path.get()];
+				[v[index - 1], v[index]] = [v[index], v[index - 1]]
+				path.model.set(path, v)
+			}
+			const onMoveDown = () => {
+				const v = [...path.get()];
+				[v[index + 1], v[index]] = [v[index], v[index + 1]]
+				path.model.set(path, v)
+			}
+			const actions: MenuAction[] = [
+				{
+					icon: 'duplicate',
+					label: 'duplicate',
+					onSelect: () => {
+						const v = [...path.get()]
+						v.splice(index, 0, { id: hexId(), node: deepClone(cValue) })
+						path.model.set(path, v)
+					},
+				},
+			]
+			return <MemoedTreeNode key={cId} label={label} path={cPath} schema={children} value={cValue} {...{lang, version, states, actions}} ctx={{...ctx, index: (index === 0 ? 1 : 0) + (index === value.length - 1 ? 2 : 0)}}>
+				{canToggle && <button class="toggle tooltipped tip-se" aria-label={`${localize(lang, 'collapse')}\n${localize(lang, 'collapse_all', 'Ctrl')}`} onClick={collapse(cId)}>{Octicon.chevron_down}</button>}
+				<button class="remove tooltipped tip-se" aria-label={localize(lang, 'remove')} onClick={onRemove}>{Octicon.trashcan}</button>
+				{value.length > 1 && <div class="node-move">
+					<button class="move tooltipped tip-se" aria-label={localize(lang, 'move_up')} onClick={onMoveUp} disabled={index === 0}>{Octicon.chevron_up}</button>
+					<button class="move tooltipped tip-se" aria-label={localize(lang, 'move_down')} onClick={onMoveDown} disabled={index === value.length - 1}>{Octicon.chevron_down}</button>
+				</div>}
+			</MemoedTreeNode>
+		})}
+		{(value && value.length > 0 && value.length <= maxShown) && <div class="node node-header">
+			<button class="add tooltipped tip-se" aria-label={localize(lang, 'add_bottom')} onClick={onAddBottom}>{Octicon.plus_circle}</button>
+		</div>}
+	</>
+}
+
 function BooleanSuffix({ path, node, value, lang }: NodeProps<BooleanHookParams>) {
 	const set = (target: boolean) => {
 		path.model.set(path, node.optional() && value === target ? undefined : target)
@@ -488,7 +490,7 @@ function StringSuffix({ path, getValues, config, node, value, lang, version, sta
 				{values.map(v => <option value={v} />)}
 			</datalist>}
 			{['generator_biome.biome'].includes(context) && <input type="color" value={rgbToHex(biomeColors[fullId] ?? VanillaColors[fullId] ?? stringToColor(fullId))} onChange={v => setBiomeColor(fullId, hexToRgb(v.currentTarget.value))}></input>}
-			{['attribute_modifier.id', 'text_component_object.hoverEvent.show_entity.contents.id', 'enchantment.effects.entry.uuid'].includes(context) && <button onClick={() => path.set(generateUUID())} class="tooltipped tip-se" aria-label={localize(lang, 'generate_new_uuid')}>{Octicon.sync}</button>}
+			{(['text_component_object.hoverEvent.show_entity.contents.id', 'enchantment.effects.entry.uuid'].includes(context) || ('attribute_modifier.id' === context && !checkVersion(version, '1.21'))) && <button onClick={() => path.set(generateUUID())} class="tooltipped tip-se" aria-label={localize(lang, 'generate_new_uuid')}>{Octicon.sync}</button>}
 			{gen && values.includes(value) && value.startsWith('minecraft:') &&
 				<a href={`/${gen.url}/?version=${version}&preset=${value.replace(/^minecraft:/, '')}`} class="tooltipped tip-se" aria-label={localize(lang, 'follow_reference')}>{Octicon.link_external}</a>}
 		</>
@@ -543,7 +545,7 @@ function TreeNode({ label, schema, path, value, lang, version, states, ctx, acti
 						<span>{a.description ?? localize(lang, a.label)}</span>
 					</div>)}
 					<div class="menu-item">
-						<Btn icon="clippy" tooltip={localize(lang, 'copy_context')} tooltipLoc="se" onClick={() => navigator.clipboard.writeText(context)} />
+						<Btn icon="copy" tooltip={localize(lang, 'copy_context')} tooltipLoc="se" onClick={() => navigator.clipboard.writeText(context)} />
 						<span>{context}</span>
 					</div>
 				</div>}

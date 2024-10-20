@@ -5,13 +5,15 @@ import { useCallback, useContext, useMemo, useState } from 'preact/hooks'
 import config from '../Config.js'
 import type { VersionId } from '../services/index.js'
 import { Store } from '../Store.js'
-import { cleanUrl } from '../Utils.js'
+import { cleanUrl, genPath } from '../Utils.js'
+import { useVersion } from './Version.jsx'
 
 export type Project = {
 	name: string,
 	namespace?: string,
 	version?: VersionId,
 	files: ProjectFile[],
+	unknownFiles?: UnknownFile[],
 }
 export const DRAFT_PROJECT: Project = {
 	name: 'Drafts',
@@ -23,6 +25,11 @@ export type ProjectFile = {
 	type: string,
 	id: string,
 	data: any,
+}
+
+export type UnknownFile = {
+	path: string,
+	data: string,
 }
 
 export const FilePatterns = [
@@ -62,6 +69,7 @@ export function useProject() {
 
 export function ProjectProvider({ children }: { children: ComponentChildren }) {
 	const [projects, setProjects] = useState<Project[]>(Store.getProjects())
+	const { version } = useVersion()
 
 	const [projectName, setProjectName] = useState<string>(Store.getOpenProject())
 	const project = useMemo(() => {
@@ -119,13 +127,13 @@ export function ProjectProvider({ children }: { children: ComponentChildren }) {
 	}, [updateProject, project, file])
 
 	const openFile = useCallback((type: string, id: string) => {
-		const gen = config.generators.find(g => g.id === type || g.path === type)
+		const gen = config.generators.find(g => g.id === type || genPath(g, version) === type)
 		if (!gen) {
 			throw new Error(`Cannot find generator of type ${type}`)
 		}
 		setFileId([gen.id, id])
 		route(cleanUrl(gen.url))
-	}, [])
+	}, [version])
 
 	const closeFile = useCallback(() => {
 		setFileId(undefined)
@@ -149,7 +157,7 @@ export function ProjectProvider({ children }: { children: ComponentChildren }) {
 	</Project.Provider>
 }
 
-export function getFilePath(file: { id: string, type: string }) {
+export function getFilePath(file: { id: string, type: string }, version: VersionId) {
 	const [namespace, id] = file.id.includes(':') ? file.id.split(':') : ['minecraft', file.id]
 	if (file.type === 'pack_mcmeta') {
 		if (file.id === 'pack') return 'pack.mcmeta'
@@ -159,17 +167,17 @@ export function getFilePath(file: { id: string, type: string }) {
 	if (!gen) {
 		return undefined
 	}
-	return `data/${namespace}/${gen.path ?? gen.id}/${id}.json`
+	return `data/${namespace}/${genPath(gen, version)}/${id}.json`
 }
 
-export function disectFilePath(path: string) {
+export function disectFilePath(path: string, version: VersionId) {
 	if (path === 'pack.mcmeta') {
 		return { type: 'pack_mcmeta', id: 'pack' }
 	}
 	for (const p of FilePatterns) {
 		const match = path.match(p)
 		if (!match) continue
-		const gen = config.generators.find(g => (g.path ?? g.id) === match[2])
+		const gen = config.generators.find(g => (genPath(g, version) ?? g.id) === match[2])
 		if (!gen) continue
 		const namespace = match[1]
 		const name = match[3].replace(/\.[a-z]+$/, '')

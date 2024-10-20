@@ -1,5 +1,5 @@
-import type { BlockDefinitionProvider, BlockFlagsProvider, BlockModelProvider, BlockPropertiesProvider, ItemStack, TextureAtlasProvider, UV } from 'deepslate/render'
-import { BlockDefinition, BlockModel, Identifier, ItemRenderer, TextureAtlas, upperPowerOfTwo } from 'deepslate/render'
+import type { BlockDefinitionProvider, BlockFlagsProvider, BlockModelProvider, BlockPropertiesProvider, ItemStack, TextureAtlasProvider, UV } from 'deepslate-1.20.4/render'
+import { BlockDefinition, BlockModel, Identifier, ItemRenderer, TextureAtlas, upperPowerOfTwo } from 'deepslate-1.20.4/render'
 import config from '../Config.js'
 import { message } from '../Utils.js'
 import { fetchLanguage, fetchResources } from './DataFetcher.js'
@@ -98,14 +98,14 @@ export class ResourceManager implements Resources {
 
 	private loadBlockModels(models: Map<string, unknown>) {
 		[...models.entries()].forEach(([id, model]) => {
-			this.blockModels[Identifier.create(id).toString()] = BlockModel.fromJson(model)
+			this.blockModels[Identifier.create(id).toString()] = BlockModel.fromJson(id, model)
 		})
 		Object.values(this.blockModels).forEach(m => m.flatten(this))
 	}
 
 	private loadBlockDefinitions(definitions: Map<string, unknown>) {
 		[...definitions.entries()].forEach(([id, definition]) => {
-			this.blockDefinitions[Identifier.create(id).toString()] = BlockDefinition.fromJson(definition)
+			this.blockDefinitions[Identifier.create(id).toString()] = BlockDefinition.fromJson(id, definition)
 		})
 	}
 

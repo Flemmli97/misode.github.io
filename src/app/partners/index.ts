@@ -1,7 +1,8 @@
 import type { CollectionRegistry, SchemaRegistry } from '@mcschema/core'
-import { VersionId } from '../services/Schemas.js'
+import type { VersionId } from '../services/Schemas.js'
 import { initImmersiveWeathering } from './ImmersiveWeathering.js'
 import { initLithostitched } from './Lithostitched.js'
+import { initNeoForge } from './NeoForge.js'
 import { initObsidian } from './Obsidian.js'
 import { initOhTheTreesYoullGrow } from './OhTheTreesYoullGrow.js'
 import { initRunecraftory } from './RuneCraftory.js'
@@ -12,11 +13,12 @@ export * from './Lithostitched.js'
 export * from './RuneCraftory.js'
 export * from './SimpleQuests.js'
 
-export function initPartners(id: VersionId, schemas: SchemaRegistry, collections: CollectionRegistry) {
+export function initPartners(schemas: SchemaRegistry, collections: CollectionRegistry, version: VersionId) {
 	initImmersiveWeathering(schemas, collections)
-	initLithostitched(schemas, collections)
+	initLithostitched(schemas, collections, version)
+	initNeoForge(schemas, collections, version)
 	initObsidian(schemas, collections)
 	initOhTheTreesYoullGrow(schemas, collections)
-	initRunecraftory(id, schemas, collections)
-	initSimpleQuests(id, schemas, collections)
+	initRunecraftory(version, schemas, collections)
+	initSimpleQuests(version, schemas, collections)
 }
