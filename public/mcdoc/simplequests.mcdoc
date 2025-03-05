@@ -3,6 +3,7 @@ use ::java::data::advancement::predicate::ItemPredicate
 use ::java::data::advancement::predicate::LocationPredicate
 use ::java::server::world::item::DataComponentPatch
 use ::java::data::advancement::predicate::BlockPredicate
+use ::java::server::world::item::ItemStack
 
 dispatch minecraft:resource[simplequests:quest_category] to struct QuestCategory {
 	name: string,
@@ -15,15 +16,6 @@ dispatch minecraft:resource[simplequests:quest_category] to struct QuestCategory
 	is_visible?: boolean,
 	is_silent?: boolean,
 	required_contexts?: [string],
-}
-
-struct ItemStack {
-	id: #[id="item"] string,
-	count?: int @ 1..,
-	#[since="1.20.5"]
-	components?: DataComponentPatch,
-	#[until="1.20.5"]
-	tag?: minecraft:item[[id]],
 }
 
 type DescriptiveValue<C> = struct {
