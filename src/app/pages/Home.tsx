@@ -105,6 +105,9 @@ function Tools() {
 		<ToolCard title="Template Placer"
 			link="https://misode.github.io/template-placer/"
 			desc="Automatically place all the structure pieces in your world" />
+		<ToolCard title="Quest Converter"
+			link="/simplequests_convert/"
+			desc="Convert quests" />
 	</ToolGroup>
 }
 

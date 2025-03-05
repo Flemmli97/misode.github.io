@@ -4,6 +4,7 @@ import '../styles/global.css'
 import '../styles/nodes.css'
 import { Analytics } from './Analytics.js'
 import { Header } from './components/index.js'
+import { QuestConversionPanel } from './components/partners/QuestConversionPanel.jsx'
 import { Changelog, Convert, Customized, Generator, Generators, Guide, Guides, Home, LegacyPartners, Partners, Sounds, Transformation, Versions, WhatsNew, Worldgen } from './pages/index.js'
 import { cleanUrl } from './Utils.js'
 
@@ -32,6 +33,7 @@ export function App() {
 			<WhatsNew path="/whats-new" />
 			<Guides path="/guides" />
 			<Guide path="/guides/:id" />
+			<QuestConversionPanel path="/simplequests_convert" />
 			<Generator default />
 		</Router>
 	</>

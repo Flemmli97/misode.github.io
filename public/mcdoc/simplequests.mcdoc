@@ -1,0 +1,258 @@
+use ::java::data::advancement::predicate::EntityPredicate
+use ::java::data::advancement::predicate::ItemPredicate
+use ::java::data::advancement::predicate::LocationPredicate
+use ::java::server::world::item::DataComponentPatch
+use ::java::data::advancement::predicate::BlockPredicate
+
+dispatch minecraft:resource[simplequests:quest_category] to struct QuestCategory {
+	name: string,
+	description?: [string],
+	icon?: ItemStack,
+	only_same_category?: boolean,
+	max_concurrent_quests?: int,
+	sorting_id?: int,
+	max_daily?: int,
+	is_visible?: boolean,
+	is_silent?: boolean,
+	required_contexts?: [string],
+}
+
+struct ItemStack {
+	id: #[id="item"] string,
+	count?: int @ 1..,
+	#[since="1.20.5"]
+	components?: DataComponentPatch,
+	#[until="1.20.5"]
+	tag?: minecraft:item[[id]],
+}
+
+type DescriptiveValue<C> = struct {
+	description: string,
+	value: C,
+}
+
+type OptionalDescriptiveValue<C> = (C | struct {
+	description: string,
+	value: C,
+})
+
+type NumberProvider = (
+	float |
+	struct {
+		type?: (#[id="loot_number_provider_type"] #[dispatcher_key="simplequests:number_provider"] string),
+		...minecraft:number_provider[[type]],
+		...simplequests:number_provider[[type]],
+	}
+)
+
+dispatch simplequests:number_provider[simplequests_api:context_multiplier] to struct QuestContextMultiplier {
+	value: NumberProvider,
+	multiplier: float,
+	max?: float
+}
+
+// Quest Entries
+dispatch simplequests:entry[simplequests_api:advancement] to struct AdvancementTask {
+	advancements: [DescriptiveValue<#[id=advancement] string>],
+	reset: boolean,
+	description?: string,
+	player_predicate?: EntityPredicate,
+}
+dispatch simplequests:entry[simplequests_api:item] to struct ItemEntry {
+	predicates: [DescriptiveValue<ItemPredicate>],
+	amount: NumberProvider,
+	consume_items: boolean,
+	description?: string,
+	player_predicate?: EntityPredicate,
+}
+dispatch simplequests:entry[simplequests_api:kill] to struct KillTask {
+	predicates: [DescriptiveValue<EntityPredicate>],
+	amount: NumberProvider,
+	description?: string,
+	player_predicate?: EntityPredicate,
+}
+dispatch simplequests:entry[simplequests_api:xp] to struct XPTask {
+	amount: NumberProvider,
+	description?: string,
+	player_predicate?: EntityPredicate,
+}
+dispatch simplequests:entry[simplequests_api:block_interact] to struct BlockInteractTask {
+	block_predicates: [DescriptiveValue<BlockPredicate>],
+	item_predicates?: [DescriptiveValue<ItemPredicate>],
+	amount: NumberProvider,
+	consume: boolean,
+	use: boolean,
+	allow_dupes: boolean,
+	description?: string,
+	player_predicate?: EntityPredicate,
+}
+dispatch simplequests:entry[simplequests_api:entity_interact] to struct EntityInteractTask {
+	entity_predicates: [DescriptiveValue<EntityPredicate>],
+	item_predicates?: [DescriptiveValue<ItemPredicate>],
+	amount: NumberProvider,
+	consume: boolean,
+	description?: string,
+	player_predicate?: EntityPredicate,
+}
+dispatch simplequests:entry[simplequests_api:crafting, simplequests_api:fishing] to struct ItemAssignedTask {
+	item_predicates: [DescriptiveValue<ItemPredicate>],
+	amount: NumberProvider,
+	description?: string,
+	player_predicate?: EntityPredicate,
+}
+dispatch simplequests:entry[simplequests_api:predicates] to struct PredicateTask {
+	predicates: [DescriptiveValue<EntityPredicate>],
+	description?: string,
+	submit: boolean,
+}
+
+// TODO regex
+// const DATE = new RegExp("^(?:(?<weeks>[0-9]{1,2})w)?" +
+// 	"(?:(?:^|:)(?<days>[0-9])d)?" +
+// 	"(?:(?:^|:)(?<hours>[0-9]{1,2})h)?" +
+// 	"(?:(?:^|:)(?<minutes>[0-9]{1,2})m)?" +
+// 	"(?:(?:^|:)(?<seconds>[0-9]{1,2})s)?$")
+type Time = (
+// #[match_regex=(regex="^(?:(?<weeks>[0-9]{1,2})w)?(?:(?:^|:)(?<days>[0-9])d)?(?:(?:^|:)(?<hours>[0-9]{1,2})h)?(?:(?:^|:)(?<minutes>[0-9]{1,2})m)?(?:(?:^|:)(?<seconds>[0-9]{1,2})s)?$", error="error.invalid.value.time")]
+	string | 
+	#[name="timeInTicks"]
+	int
+)
+
+struct QuestEntry {
+	id: (#[name="Builtin"] QuestEntryTypes | string),
+	...simplequests:entry[[id]],
+}
+struct QuestTasksMap {
+	[string]: QuestEntry,
+}
+
+enum(string) QuestEntryTypes {
+	#[starred] ItemTask = "simplequests_api:item",
+	#[starred] KillTask = "simplequests_api:entity",
+	AdvancementTask = "simplequests_api:advancement",
+	BlockInteractTask = "simplequests_api:block_interact",
+	CraftingTask = "simplequests_api:crafting",
+	EntityInteractTask = "simplequests_api:entity_interact",
+	FishingTask = "simplequests_api:fishing",
+	PredicateTask = "simplequests_api:predicates",
+	XPTask = "simplequests_api:xp",
+	#[name="Level (Runecraftory)"] Level = "runecraftory:level",
+	#[name="Talk to (Runecraftory)"] NPCTalk = "runecraftory:npc_talk",
+	#[name="Shipping (Runecraftory)"] Shipping = "runecraftory:shipping",
+	#[name="Skill Level (Runecraftory)"] SkillLevel = "runecraftory:skill_level",
+	#[name="Taming (Runecraftory)"] Taming = "runecraftory:taming",
+}
+
+// Quest types
+dispatch simplequests:quests[simplequests_api:quest] to struct Quest {
+	loot_table: #[id="loot_table"] string,
+	command?: string,
+	submission_trigger?: string,
+	tasks: QuestTasksMap,
+}
+dispatch simplequests:quests[simplequests_api:composite_quest] to struct CompositeQuest {
+	quests: [#[id] string] @ 1..,
+}
+dispatch simplequests:quests[simplequests_api:sequential_quest] to struct SequentialQuest {
+	loot_table: #[id="loot_table"] string,
+	command?: string,
+	quests: [#[id] string] @ 1..,
+}
+
+dispatch minecraft:resource[simplequests:quest] to struct QuestBase {
+	category?: #[id="simplequests:quest_category"] string,
+	name: string,
+	description?: [string],
+	parent_id?: #[id="simplequests:quest"] string, 
+	redo_parent?: boolean,
+	need_unlock?: boolean,
+	unlock_condition?: EntityPredicate,
+	icon?: ItemStack,
+	repeat_delay?: Time,
+	repeat_daily?: int @ 0..,
+	max_repeat?: int @ 0..,
+	sorting_id?: int,
+	daily_quest?: boolean,
+	visibility?: ("DEFAULT" | "ALWAYS" | "NEVER"),
+	type: (#[name="Builtin"] QuestTypes | string),
+	...simplequests:quests[[type]],
+}
+
+enum(string) QuestTypes {
+	#[starred] Quest = "simplequests_api:quest",
+	SequentialQuest = "simplequests_api:sequential_quest",
+	CompositeQuest = "simplequests_api:composite_quest",
+	#[name="NPCQuest (Runecraftory)"] NPCQuest = "runecraftory:npc_quest",
+	// #[name="QuestBoardQuest (Runecraftory)"] NPCQuest = "runecraftory:quest_board_quest",
+}
+
+// Runecraftory
+
+dispatch simplequests:quests[runecraftory:npc_quest] to struct {
+	target_npc_ids: [#[id="runecraftory:npc_data"] string],
+	quests: [#[id="simplequests:quest"] string],
+	loot_table: #[id="loot_table"] string,
+	global: boolean,
+}
+
+dispatch simplequests:entry[runecraftory:level] to struct {
+	level: NumberProvider,
+	description: string,
+}
+dispatch simplequests:entry[runecraftory:npc_talk] to struct {
+	/// Not implemented
+	// target_npc_id?: string,
+	predicate?: EntityPredicate
+}
+dispatch simplequests:entry[runecraftory:shipping] to struct {
+	item_predicates: [DescriptiveValue<ItemPredicate>],
+	amount: NumberProvider,
+	description?: string,
+}
+type Skills = (
+	"SHORTSWORD" |
+    "LONGSWORD" |
+    "SPEAR" |
+    "HAMMERAXE" |
+    "DUAL" |
+    "FIST" |
+    "FIRE" |
+    "WATER" |
+    "EARTH" |
+    "WIND" |
+    "DARK" |
+    "LIGHT" |
+    "LOVE" |
+    "FARMING" |
+    "LOGGING" |
+    "MINING" |
+    "FISHING" |
+    "COOKING" |
+    "FORGING" |
+    "CHEMISTRY" |
+    "CRAFTING" |
+    "SLEEPING" |
+    "SEARCHING" |
+    "WALKING" |
+    "EATING" |
+    "DEFENCE" |
+    "RES_POISON" |
+    "RES_SEAL" |
+    "RES_PARA" |
+    "RES_SLEEP" |
+    "RES_FATIGUE" |
+    "RES_COLD" |
+    "BATH" |
+    "TAMING" |
+    "LEADER"
+)
+dispatch simplequests:entry[runecraftory:skill_level] to struct {
+	skill: [Skills],
+	level: NumberProvider,
+}
+dispatch simplequests:entry[runecraftory:taming] to struct {
+	predicates: [DescriptiveValue<EntityPredicate>],
+	amount: NumberProvider,
+	description?: string,
+}

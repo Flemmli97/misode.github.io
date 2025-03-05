@@ -2,7 +2,7 @@ import * as core from '@spyglassmc/core'
 import type { JsonNode, JsonPairNode } from '@spyglassmc/json'
 import { JsonArrayNode, JsonObjectNode, JsonStringNode } from '@spyglassmc/json'
 import { JsonStringOptions } from '@spyglassmc/json/lib/parser/string.js'
-import type { Attributes, AttributeValue, ListType, McdocType, NumericType, PrimitiveArrayType, TupleType, UnionType } from '@spyglassmc/mcdoc'
+import type { Attribute, Attributes, AttributeValue, ListType, LiteralType, McdocType, NumericType, PrimitiveArrayType, TupleType, UnionType } from '@spyglassmc/mcdoc'
 import { NumericRange, RangeKind } from '@spyglassmc/mcdoc'
 import type { McdocCheckerContext, SimplifiedMcdocType, SimplifiedMcdocTypeNoUnion, SimplifyValueNode } from '@spyglassmc/mcdoc/lib/runtime/checker/index.js'
 import { simplify } from '@spyglassmc/mcdoc/lib/runtime/checker/index.js'
@@ -288,12 +288,27 @@ export function formatIdentifier(id: string, attributes?: Attributes): string {
 	if (id.startsWith('!')) {
 		return '! ' + formatIdentifier(id.substring(1), attributes)
 	}
+	id = nameFromAttribute(attributes) ?? id
 	const isStarred = attributes?.some(a => a.name === 'starred')
 	const text = id
 		.replace(/^minecraft:/, '')
 		.replaceAll('_', ' ')
 		.replace(/[a-z][A-Z]+/g, m => m.charAt(0) + ' ' + m.substring(1).toLowerCase())
 	return (isStarred ? '✨ ' : '') + text.charAt(0).toUpperCase() + text.substring(1)
+}
+
+export function nameFromAttribute(attributes?: Attributes): string | undefined {
+	return namedAttribute(attributes)?.value.value.toString()
+}
+
+export function namedAttribute(attributes?: Attributes): LiteralType | undefined {
+	function isNameAtt(att: Attribute): att is {
+		name: string;
+		value?: LiteralType | undefined;
+	} {
+		return att.name === "name" && att.value?.kind === "literal";
+	}
+	return attributes?.find(isNameAtt)?.value
 }
 
 export function getCategory(type: McdocType) {
