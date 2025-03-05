@@ -1,0 +1,604 @@
+use ::java::data::advancement::predicate::EntityPredicate
+use ::java::data::advancement::predicate::ItemPredicate
+use ::java::server::world::item::ItemStack
+use ::java::data::util::NumberProvider
+
+dispatch minecraft:resource[runecraftory:crops] to struct Crops {
+	item: #[id=(registry="item", tags="allowed")] string,
+	growth: int @ 1..,
+	max_drops:  int @ 0..,
+	regrowable: boolean,
+	giant_crop?:  #[id="block"] string,
+	best_season?:  [("SPRING" | "SUMMER" | "FALL" | "WINTER")],
+	bad_season?:  [("SPRING" | "SUMMER" | "FALL" | "WINTER")],
+}
+
+dispatch minecraft:resource[runecraftory:food] to struct Food {
+	item: #[id=(registry="item", tags="allowed")] string,
+	duration: int @ 0..,
+	effects: struct {
+		[AttributeIDS]: double,
+	},
+	effects_percentage:  struct {
+		[AttributeIDS]: double,
+	},
+	cooking_bonus:  struct {
+		[AttributeIDS]: double,
+	},
+	cookingBonus_percent:  struct {
+		[AttributeIDS]: double,
+	},
+	potion_apply:  struct {
+		item: #[id="mob_effect"] string,
+		duration: int @ 1..,
+		amplifier: int,
+	},
+	potion_remove:  [#[id="mob_effect"] string],
+}
+
+dispatch minecraft:resource[runecraftory:item_stats] to struct ItemStats {
+	item: #[id=(registry="item", tags="allowed")] string,
+	buy_price:  int @ 0..,
+	sell_price:  int @ 0..,
+	upgrade_difficulty:  int @ 0..,
+	item_stats:  struct {
+		[AttributeIDS]: double,
+	},
+	monster_bonus:  struct {
+		[AttributeIDS]: double,
+	},
+	element: ("NONE" | "WATER" | "EARTH" | "WIND" | "FIRE" | "LIGHT" | "DARK" | "LOVE"),
+	tier_1_Spell?: #[id] #[dispatcher_key="runecraftory:spells"] string,
+	tier_2_Spell?: #[id] #[dispatcher_key="runecraftory:spells"] string,
+	tier_3_Spell?: #[id] #[dispatcher_key="runecraftory:spells"] string,
+	armor_effect?:  #[id] #[dispatcher_key="runecraftory:armor_effects"] string,
+}
+
+type StructureID = (#[until="1.19"] #[id="worldgen/configured_structure_feature"] string |
+		 #[since="1.19"] #[id="worldgen/structure"] string)
+
+dispatch minecraft:resource[runecraftory:gate_spawning] to struct GateSpawning {
+	entity: #[id=(registry="entity", tags="allowed")] string,
+	min_distance_from_spawn:  int @ 0..,
+	min_gate_level:  int @ 0..,
+	allow_underwater:  boolean,
+	biomes: struct {
+		[#[id="worldgen/biome"] string]: int @ 1..,
+	},
+	structures: struct {
+		[StructureID]: int @ 1..,
+	},
+	gate_predicate?:  EntityPredicate,
+	player_predicate?:  EntityPredicate,
+}
+
+dispatch minecraft:resource[runecraftory:shop_items] to struct ShopItems {
+	replace: boolean,
+	values: [ShopItemsContent],
+}
+
+struct ShopItemsContent {
+	item: ((#[id=(registry="item", tags="allowed")] string | ItemStack) | [((#[id=(registry="item")] string) | ItemStack)]),
+	unlock_type: ("DEFAULT" | "ALWAYS" | "NEEDS_SHIPPING"),
+	predicate?: EntityPredicate,
+}
+
+// ===== NPC Stuff =====
+
+dispatch runecraftory:npc_actions[runecraftory:do_nothing] to struct {
+	duration: NumberProvider,
+	cooldown?: NumberProvider,
+}
+dispatch runecraftory:npc_actions[runecraftory:melee_attack] to struct {
+	walk_time:  NumberProvider,
+	cooldown?: NumberProvider,
+	speed: float,
+}
+dispatch runecraftory:npc_actions[runecraftory:spell_attack] to struct {
+	spell: #[id] #[dispatcher_key="runecraftory:spells"] string,
+	range: double @ 0..,
+	ignore_seal:  boolean,
+	walk_time:  NumberProvider,
+	cooldown?: NumberProvider,
+	combos?: NumberProvider,
+}
+dispatch runecraftory:npc_actions[runecraftory:party_target_action] to struct {
+	spell: #[id] #[dispatcher_key="runecraftory:spells"] string,
+	ignore_seal:  boolean,
+	cooldown: NumberProvider,
+}
+dispatch runecraftory:npc_actions[runecraftory:food_throw_action] to struct {
+	items: [ItemStack],
+	walk_time:  NumberProvider,
+	cooldown: NumberProvider,
+}
+dispatch runecraftory:npc_actions[runecraftory:run_away] to struct {
+	duration: NumberProvider,
+	cooldown: NumberProvider,
+	max_dist:  double,
+	speed: float,
+}
+dispatch runecraftory:npc_actions[runecraftory:walk_around] to struct {
+	duration: NumberProvider,
+	cooldown: NumberProvider,
+}
+dispatch runecraftory:npc_actions[runecraftory:run_to_leader] to struct {
+	duration: NumberProvider,
+	cooldown: NumberProvider,
+}
+
+dispatch minecraft:resource[runecraftory:npc_actions] to struct NPCActions {
+	actions: [struct {
+		weight: int @ 1..,
+		predicate?: EntityPredicate,
+		concurrent_actions?: [struct {
+			type: #[id] #[dispatcher_key="runecraftory:npc_actions"] string,
+			...runecraftory:npc_actions[[type]]
+		}],
+	}],
+}
+
+dispatch minecraft:resource[runecraftory:conversations] to struct Conversation {
+	fallback_key:  string,
+	conversations: struct {
+		[string]: struct {
+			translation_key:  string,
+			min_hearts?:  int @ 0..,
+			max_hearts?:  int @ 0..,
+			starting_conversation?:  boolean,
+			actions?: [struct {
+				translation_key:  string,
+				action: ("ANSWER" | "QUEST"),
+				action_value:  string,
+				friend_xp:  int @ 0..,
+			}],
+			conditions: struct {
+				type: (#[id="loot_condition_type"] #[dispatcher_key="runecraftory:loot_condition_type"] string),
+				...minecraft:loot_condition_type[[type]],
+				...runecraftory:loot_condition_type[[type]],
+			}
+		}
+	},
+}
+
+dispatch minecraft:resource[runecraftory:npc_data] to struct NPCData {
+	name?: string,
+	surname?: string,
+	gender?: ("UNDEFINED" | "MALE" | "FEMALE"),
+	profession?: #[id] #[dispatcher_key="runecraftory:professions"] string,
+	look?: [#[id] #[dispatcher_key="runecraftory:look"] string],
+	birthday?: struct {
+		season: ("SPRING" | "SUMMER" | "FALL" | "WINTER"),
+		day: int @ 1..30,
+	},
+	weight: int @ 1..,
+	unique: int @ 0..,
+	relation: struct {
+		relation_ship_state: ("DEFAULT" | "NON_ROMANCEABLE" | "NO_ROMANCE_NPC" | "NO_ROMANCE"),
+		possible_children?: [#[id="runecraftory:npc_data"] string],
+	},
+	neutral_gift_response: string,
+	gift_items: struct {
+		[string]: struct {
+			gift_id: #[id="runecraftory:gift_data"] string,
+			response_key: string,
+			xp: int,
+		},
+	},
+	interactions: struct {
+		[#[id] #[dispatcher_key="runecraftory:conversation_contexts"] string]: #[id="runecraftory:conversations"] string,
+	},
+	quest_handler: struct {
+		responses: struct {
+			[#[id] string]: struct {
+				start_id: #[id] string,
+				active_id: #[id] string,
+				end_id: #[id] string,
+			}
+		},
+		required_quests: [#[id] string],
+	},
+	schedule?: struct {
+		wake_up_time: int @ 0..,
+		work_time: int @ 1..,
+		break_time: int @ 1..,
+		work_time_after: int @ 1..,
+		done_work_time: int @ 1..,
+		meet_time: int @ 1..,
+		meet_time_after: int @ 1..,
+		sleep_time: int @ 1..,
+		work_days: [("MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY")],
+	},
+	combat?: struct {
+		base_level?: int @ 1..,
+		combat_actions?: [#[id="runecraftory:npc_actions"] string],
+		base_stats?: struct {
+			[AttributeIDS]: double,
+		},
+		stat_increase?: struct {
+			[AttributeIDS]: double,
+		},
+	},
+}
+
+dispatch minecraft:resource[runecraftory:gift_data] to struct GiftData {
+	items: [#[id=(registry="item", tags="allowed")] string],
+	xp_range: struct {
+		min?: int,
+		max?: int,
+	},
+	translations: [string] @ 1..,
+}
+
+dispatch minecraft:resource[runecraftory:npc_looks] to struct NPCLook {
+	player_skin?: string,
+	gender?: ("UNDEFINED" | "MALE" | "FEMALE"),
+	weight: int @ 0..,
+	additional_features: [LookFeature],
+}
+
+struct LookFeature {
+	type: #[id] #[dispatcher_key="runecraftory:npc_look_feature"] string,
+	...runecraftory:npc_look_feature[[type]]
+}
+
+type ColorSetting = [(#[color="hex_rgb"] int | struct {
+	color_min: #[color="hex_rgb"] int,
+	color_max: #[color="hex_rgb"] int,
+})]
+
+type TypedIndexRange = [struct {
+	weight: int,
+	outfit: string,
+	range: struct {
+		type: RangeType,
+		...runecraftory:range_types[[type]]
+	}
+}]
+
+enum(string) RangeType {
+	FIRST_N = "FIRST_N",
+	RANGE = "RANGE",
+	SELECTED = "SELECTED"
+}
+
+dispatch runecraftory:range_types[FIRST_N] to struct {
+	amount: int @ 0..,
+}
+dispatch runecraftory:range_types[RANGE] to struct {
+	min: int,
+	max:  int,
+}
+dispatch runecraftory:range_types[SELECTED] to struct {
+	indices: [int],
+}
+
+dispatch runecraftory:npc_look_feature[runecraftory:skin_feature] to struct {
+	indices: [int],
+	colors:  ColorSetting,
+}
+dispatch runecraftory:npc_look_feature[runecraftory:iris_feature] to struct {
+	indices: [int],
+	colors:  ColorSetting,
+}
+dispatch runecraftory:npc_look_feature[runecraftory:sclera_feature] to struct {
+	indices: [int],
+	colors:  ColorSetting,
+}
+dispatch runecraftory:npc_look_feature[runecraftory:eyebrows_feature] to struct {
+	indices: [int],
+	colors:  ColorSetting,
+}
+dispatch runecraftory:npc_look_feature[runecraftory:blush_feature] to struct {
+	chance: float,
+	colors:  ColorSetting,
+}
+dispatch runecraftory:npc_look_feature[runecraftory:hair_feature] to struct {
+	styles: TypedIndexRange,
+	colors:  ColorSetting,
+}
+dispatch runecraftory:npc_look_feature[runecraftory:outfit_feature] to struct {
+	outfits: TypedIndexRange,
+}
+dispatch runecraftory:npc_look_feature[runecraftory:simple_hat_feature] to [string]
+dispatch runecraftory:npc_look_feature[runecraftory:slim_feature] to struct {}
+dispatch runecraftory:npc_look_feature[runecraftory:size_feature] to struct {
+	size: NumberProvider,
+}
+
+// ===== Registry stuff =====
+
+type LootConditionIDS = #[id="loot_condition_type"] #[dispatcher_key="runecraftory:loot_condition_type"] string
+
+dispatch runecraftory:loot_condition_type[runecraftory:biome] to struct BiomeCondition {
+	biome_tag: #[id=(registry="worldgen/biome", tags="required")] string,
+}
+dispatch runecraftory:loot_condition_type[runecraftory:friend_points] to struct FriendPointCondition {
+	points: int @ 0..,
+}
+dispatch runecraftory:loot_condition_type[runecraftory:interacting_player] to struct RelationCondition{
+	relation: ("NORMAL" | "DATING" | "MARRIED"),
+}
+dispatch runecraftory:loot_condition_type[runecraftory:season] to struct SeasonCondition {
+	season: ("SPRING" | "SUMMER" | "FALL" | "WINTER"),
+}
+dispatch runecraftory:loot_condition_type[runecraftory:skill_check] to struct SkillCondition {
+	skill: Skills,
+	min_required_level: int @ 0..,
+}
+dispatch runecraftory:loot_condition_type[runecraftory:talk_count] to struct TalkCondition {
+	count: int @ 0..,
+}
+
+type AttributeIDS = #[id="attribute"] #[dispatcher_key="runecraftory:attributes"] string
+
+dispatch runecraftory:attributes[
+	runecraftory:health_gain,
+	runecraftory:rp_gain,
+	runecraftory:rp_increase,
+	runecraftory:attack_speed_modifier,
+	runecraftory:attack_range,
+	runecraftory:attack_width,
+	runecraftory:charge_time,
+	runecraftory:defence,
+	runecraftory:magic_attack,
+	runecraftory:magic_defence,
+	runecraftory:paralysis,
+	runecraftory:poison,
+	runecraftory:seal,
+	runecraftory:sleep,
+	runecraftory:fatigue,
+	runecraftory:cold,
+	runecraftory:dizzy,
+	runecraftory:crit,
+	runecraftory:stun,
+	runecraftory:faint,
+	runecraftory:drain,
+	runecraftory:knockback,
+	runecraftory:res_water,
+	runecraftory:res_earth,
+	runecraftory:res_wind,
+	runecraftory:res_fire,
+	runecraftory:res_dark,
+	runecraftory:res_light,
+	runecraftory:res_love,
+	runecraftory:res_paralysis,
+	runecraftory:res_poison,
+	runecraftory:res_seal,
+	runecraftory:res_sleep,
+	runecraftory:res_fatigue,
+	runecraftory:res_cold,
+	runecraftory:res_dizzy,
+	runecraftory:res_crit,
+	runecraftory:res_stun,
+	runecraftory:res_faint,
+	runecraftory:res_drain,
+	runecraftory:res_knockback
+] to struct {}
+
+dispatch runecraftory:spells[
+	runecraftory:empty_spell,
+	runecraftory:base_staff_spell,
+
+	runecraftory:vanilla_arrow,
+	runecraftory:vanilla_wither_skull,
+	runecraftory:vanilla_evoker_fang,
+	runecraftory:vanilla_snowball,
+	runecraftory:vanilla_ghast_fireball,
+	runecraftory:vanilla_dragon_fireball,
+	runecraftory:vanilla_shulker_bullet,
+	runecraftory:vanilla_blaze_fireballs,
+
+	runecraftory:fireball,
+	runecraftory:big_fireball,
+	runecraftory:explosion,
+	runecraftory:water_laser,
+	runecraftory:parallel_laser,
+	runecraftory:delta_laser,
+	runecraftory:screw_rock,
+	runecraftory:earth_spike,
+	runecraftory:avenger_rock,
+	runecraftory:sonic,
+	runecraftory:double_sonic,
+	runecraftory:penetrate_sonic,
+	runecraftory:light_barrier,
+	runecraftory:shine,
+	runecraftory:prism,
+	runecraftory:dark_snake,
+	runecraftory:dark_ball,
+	runecraftory:darkness,
+	runecraftory:cure,
+	runecraftory:cure_all,
+	runecraftory:master_cure,
+	runecraftory:medi_poison,
+	runecraftory:medi_paralysis,
+	runecraftory:medi_seal,
+
+	runecraftory:power_wave,
+	runecraftory:dash_slash,
+	runecraftory:rush_attack,
+	runecraftory:round_break,
+	runecraftory:mind_thrust,
+	runecraftory:blitz,
+	runecraftory:twin_attack,
+	runecraftory:storm,
+	runecraftory:gust,
+	runecraftory:rail_strike,
+	runecraftory:wind_slash,
+	runecraftory:flash_strike,
+	runecraftory:steel_heart,
+	runecraftory:delta_strike,
+	runecraftory:naive_blade,
+	runecraftory:hurricane,
+	runecraftory:reaper_slash,
+	runecraftory:million_strike,
+	runecraftory:axel_disaster,
+	runecraftory:stardust_upper,
+	runecraftory:grand_impact,
+	runecraftory:tornado_swing,
+	runecraftory:giga_swing,
+	runecraftory:upper_cut,
+	runecraftory:double_kick,
+	runecraftory:straight_punch,
+	runecraftory:neko_damashi,
+	runecraftory:rush_punch,
+	runecraftory:cyclone,
+	runecraftory:rapid_move,
+
+	runecraftory:teleport,
+
+	runecraftory:quadruple_wind_blade,
+	runecraftory:sextuple_wind_blade,
+	runecraftory:double_arrow,
+	runecraftory:triple_arrow,
+	runecraftory:spore_circle,
+	runecraftory:gust_wind,
+	runecraftory:stone_throw,
+	runecraftory:web_shot,
+	runecraftory:spirit_flame,
+	runecraftory:ignis_flame,
+	runecraftory:pollen_puff,
+	runecraftory:sleep_balls,
+	runecraftory:wave,
+	runecraftory:butterfly,
+	runecraftory:laser_3,
+	runecraftory:laser_5,
+	runecraftory:laser_aoe,
+	runecraftory:big_lightning,
+	runecraftory:card_attack,
+	runecraftory:throw_plush,
+	runecraftory:furniture_summon,
+	runecraftory:dark_beam,
+	runecraftory:big_plate,
+	runecraftory:dark_bullets,
+	runecraftory:poison_ball,
+	runecraftory:poison_needle,
+	runecraftory:sleep_aura,
+	runecraftory:double_bullet,
+	runecraftory:throw_held_item,
+	runecraftory:triple_fire_bullet,
+	runecraftory:double_fire_ball,
+	runecraftory:triple_fire_ball,
+	runecraftory:quad_fire_ball,
+	runecraftory:apple_shield,
+	runecraftory:apple_rain,
+	runecraftory:apple_rain_big,
+	runecraftory:apple_rain_more,
+	runecraftory:root_spike,
+	runecraftory:root_spike_triple,
+	runecraftory:fireball_barrage,
+	runecraftory:bubble_beam,
+	runecraftory:slash,
+	runecraftory:big_leaf_spell_single,
+	runecraftory:big_leaf_spell_double,
+	runecraftory:small_leaf_spell_x3,
+	runecraftory:small_leaf_spell_x5,
+	runecraftory:small_leaf_spell_x7,
+	runecraftory:bone_needles,
+	runecraftory:energy_orb_spell,
+	runecraftory:rafflesia_poison,
+	runecraftory:rafflesia_para,
+	runecraftory:rafflesia_sleep,
+	runecraftory:rafflesia_cicle,
+	runecraftory:wind_circle_x8,
+	runecraftory:wind_circle_x16,
+	runecraftory:expanding_double_light,
+	runecraftory:expanding_quad_light,
+	runecraftory:expanding_octo_light,
+	runecraftory:paralysis_ball,
+	runecraftory:wind_blade_barrage,
+	runecraftory:gust_rocks,
+	runecraftory:tornado,
+	runecraftory:water_swipe,
+	runecraftory:water_swipe_140,
+	runecraftory:water_swipe_360,
+	runecraftory:fire_wall,
+	runecraftory:ice_ball_drop,
+	runecraftory:ice_trail,
+	runecraftory:water_laser_long,
+	runecraftory:parallel_laser_long,
+	runecraftory:fire_circle,
+	runecraftory:wind_circle,
+	runecraftory:ice_circle,
+	runecraftory:earth_circle,
+	runecraftory:prism_long,
+	runecraftory:light_beam,
+	runecraftory:missile_2x,
+	runecraftory:missile_8x,
+	runecraftory:starfall,
+	runecraftory:starfall_long,
+] to struct {}
+
+dispatch runecraftory:armor_effects[
+	runecraftory:piyo_sandals,
+	runecraftory:shield_ring,
+	runecraftory:magic_ring,
+	runecraftory:throwing_ring
+] to struct {}
+
+dispatch runecraftory:professions[
+	runecraftory:jobless,
+	runecraftory:general_store,
+	runecraftory:florist,
+	runecraftory:smith,
+	runecraftory:doctor,
+	runecraftory:cook,
+	runecraftory:magicskill_merchant,
+	runecraftory:runeskill_merchant,
+	runecraftory:bathhouse_attendant,
+	runecraftory:travelling_merchant,
+] to struct {}
+
+dispatch runecraftory:conversation_contexts[
+	runecraftory:first,
+	runecraftory:greeting,
+	runecraftory:talk,
+	runecraftory:follow_yes,
+	runecraftory:follow_no,
+	runecraftory:follow_stop,
+	runecraftory:dating_accept,
+	runecraftory:dating_deny,
+	runecraftory:marriage_accept,
+	runecraftory:marriage_deny,
+	runecraftory:divorce,
+	runecraftory:divorce_error,
+	runecraftory:procreation_cooldown,
+] to struct {}
+
+type Skills = (
+	"SHORTSWORD" |
+    "LONGSWORD" |
+    "SPEAR" |
+    "HAMMERAXE" |
+    "DUAL" |
+    "FIST" |
+    "FIRE" |
+    "WATER" |
+    "EARTH" |
+    "WIND" |
+    "DARK" |
+    "LIGHT" |
+    "LOVE" |
+    "FARMING" |
+    "LOGGING" |
+    "MINING" |
+    "FISHING" |
+    "COOKING" |
+    "FORGING" |
+    "CHEMISTRY" |
+    "CRAFTING" |
+    "SLEEPING" |
+    "SEARCHING" |
+    "WALKING" |
+    "EATING" |
+    "DEFENCE" |
+    "RES_POISON" |
+    "RES_SEAL" |
+    "RES_PARA" |
+    "RES_SLEEP" |
+    "RES_FATIGUE" |
+    "RES_COLD" |
+    "BATH" |
+    "TAMING" |
+    "LEADER"
+)

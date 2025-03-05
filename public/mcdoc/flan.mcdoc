@@ -1,0 +1,121 @@
+use ::java::server::world::item::ItemStack
+
+dispatch minecraft:resource[flan:permission] to struct {
+    gui_item: ItemStack,
+    default_value: boolean,
+    global: boolean,
+	order: int,
+	required_mod?: string
+}
+
+dispatch minecraft:resource[flan:override] to struct {
+    type: #[id] OverrideTypes,
+    ...flan:overrides[[type]],
+}
+
+enum(string) OverrideTypes {
+	BlockLeftClick = "flan:block_left_click",
+	BlockInteract = "flan:block_interact",
+	ItemUse = "flan:item_use",
+	EntityAttack = "flan:entity_attack",
+	EntityInteract = "flan:entity_interact",
+}
+
+dispatch flan:overrides[flan:block_left_click, flan:block_interact] to struct {
+    values: struct {
+		entry: #[id=(registry="block", tags="allowed")] string,
+		permission: #[dispatcher_key="flan:builtin_permissions"] #[id="flan:permission"] string
+	}
+}
+
+dispatch flan:overrides[flan:item_use] to struct {
+    values: struct {
+		entry: #[id=(registry="item", tags="allowed")] string,
+		permission: #[dispatcher_key="flan:builtin_permissions"] #[id="flan:permission"] string
+	}
+}
+
+dispatch flan:overrides[flan:entity_attack, flan:entity_interact] to struct {
+    values: struct {
+		entry: #[id=(registry="entity_type", tags="allowed")] string,
+		permission: #[dispatcher_key="flan:builtin_permissions"] #[id="flan:permission"] string
+	}
+}
+
+dispatch flan:builtin_permissions[
+	flan:edit_claim,
+	flan:edit_perms,
+	flan:edit_potions,
+	flan:break,
+	flan:place,
+	flan:open_container,
+	flan:interact_block,
+	flan:interact_sign,
+	flan:anvil,
+	flan:bed,
+	flan:beacon,
+	flan:door,
+	flan:fence_gate,
+	flan:trapdoor,
+	flan:button_lever,
+	flan:pressure_plate,
+	flan:noteblock,
+	flan:redstone,
+	flan:jukebox,
+	flan:enderchest,
+	flan:enchantment,
+	flan:itemframe_rotate,
+	flan:lectern_take,
+	flan:endcrystal_place,
+	flan:target_block,
+	flan:projectiles,
+	flan:trample,
+	flan:minecart,
+	flan:portal,
+	flan:raid,
+	flan:boat,
+	flan:minecart,
+	flan:bucket,
+	flan:ender_pearl,
+	flan:chorus_fruit,
+	flan:animal_interact,
+	flan:hurt_animal,
+	flan:hurt_named,
+	flan:xp,
+	flan:trading,
+	flan:armorstand,
+	flan:break_non_living,
+	flan:drop,
+	flan:pickup,
+	flan:flight,
+	flan:can_stay,
+	flan:teleport,
+	flan:no_hunger,
+	flan:claim_message,
+
+	flan:hurt_player,
+	flan:explosions,
+	flan:wither,
+	flan:enderman,
+	flan:snow_golem,
+	flan:fire_spread,
+	flan:water_border,
+	flan:piston_border,
+	flan:mob_spawn,
+	flan:animal_spawn,
+	flan:lightning,
+	flan:lock_items,
+	flan:fake_player,
+] to struct {}
+
+#[until="1.21"]
+dispatch flan:builtin_permissions[
+	flan:frost_walker,
+] to struct {}
+
+#[since="1.20.1"] 
+dispatch flan:builtin_permissions[
+	flan:archeology,
+	flan:player_mob_spawn,
+	flan:sculk,
+] to struct {}

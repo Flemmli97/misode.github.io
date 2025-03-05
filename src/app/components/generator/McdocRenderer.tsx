@@ -18,7 +18,7 @@ import { generateColor, hexId, intToHexRgb, randomInt, randomSeed } from '../../
 import { Btn } from '../Btn.jsx'
 import { ItemDisplay } from '../ItemDisplay.jsx'
 import { Octicon } from '../Octicon.jsx'
-import { formatIdentifier, getCategory, getChange, getDefault, getItemType, isDefaultCollapsedType, isFixedList, isInlineTuple, isListOrArray, isNumericType, isSelectRegistry, quickEqualTypes, simplifyType } from './McdocHelpers.js'
+import { formatIdentifier, getCategory, getChange, getDefault, getItemType, isDefaultCollapsedType, isFixedList, isInlineTuple, isListOrArray, isNumericType, isSelectRegistry, namedAttribute, nameFromAttribute, quickEqualTypes, simplifyType } from './McdocHelpers.js'
 
 export interface McdocContext extends core.CheckerContext {
 	makeEdit: MakeEdit
@@ -127,6 +127,7 @@ function Body({ type, optional, node, ctx }: Props<SimplifiedMcdocType>) {
 			<TupleBody type={type} node={node} ctx={ctx} />
 		</div>
 	}
+	console.error("type ", type, type.kind)
 	if (type.kind === 'any' || type.kind === 'unsafe') {
 		return <AnyBody type={type} optional={optional} node={node} ctx={ctx} />
 	}
@@ -400,7 +401,7 @@ function UnionHead({ type, optional, node, ctx }: Props<UnionType<SimplifiedMcdo
 		<select value={memberIndex > -1 ? memberIndex : SPECIAL_UNSET} onInput={(e) => onSelect((e.target as HTMLSelectElement).value)}>
 			{(selectedType === undefined || optional) && <option value={SPECIAL_UNSET}>{locale('unset')}</option>}
 			{type.members.map((member, index) =>
-				<option value={index}>{formatUnionMember(member, type.members.filter(m => m !== member))}</option>
+				<option value={index}>{formatUnionMember(namedAttribute(member.attributes) ?? member, type.members.filter(m => m !== member))}</option>
 			)}
 		</select>
 		{selectedType && selectedType.kind !== 'literal' && <Head type={selectedType} node={node} ctx={ctx} />}
@@ -507,7 +508,7 @@ function StructBody({ type: outerType, node, ctx }: Props<SimplifiedStructType>)
 	const staticChilds: core.PairNode<JsonStringNode, JsonNode>[] = []
 	return <>
 		{staticFields.map(field => {
-			const key = (field.key as LiteralType).value.value.toString()
+			const key = nameFromAttribute(field.attributes) ?? (field.key as LiteralType).value.value.toString()
 			const index = node.children.findIndex(p => p.key?.value === key)
 			const pair = index === -1 ? undefined : node.children[index]
 			if (pair) {

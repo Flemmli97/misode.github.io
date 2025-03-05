@@ -1,0 +1,38 @@
+.simplequests-conversion-container {
+	display: flex;
+	flex-direction: column;
+	margin: 40px;
+	align-items: center;
+}
+
+.simplequests-conversion-done {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+}
+
+.simplequests-error {
+	color: var(--accent-danger);
+}
+
+.simplequests-error-table {
+	border-color: var(--text-1);
+    border-width: 1px;
+}
+
+.simplequests-error-table-tr {
+	padding: 4px;
+	border-color: var(--text-3);
+    border-width: 0 0 1px 0;
+}
+
+.simplequests-error-table-head {
+    border-color: var(--text-3);
+    border-width: 0 0 1px 0;
+}
+
+.error-table-column {
+	width: 300px;
+	word-break: break-all;
+}
