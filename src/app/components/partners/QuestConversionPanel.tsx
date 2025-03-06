@@ -1,6 +1,6 @@
 import { useMemo, useState } from "preact/hooks"
 import config from "../../Config.js"
-import { useLocale, useVersion } from "../../contexts/index.js"
+import { useLocale, useTitle, useVersion } from "../../contexts/index.js"
 import { checkVersion, VersionId } from "../../services/index.js"
 import { Btn } from "../Btn.jsx"
 import { FileUpload } from "../FileUpload.jsx"
@@ -19,6 +19,7 @@ interface Props {
 export function QuestConversionPanel(_props: Props) {
 	const { locale } = useLocale()
 	const { version, changeVersion } = useVersion()
+	useTitle(locale("generator.simplequests.converter"))
 
 	const [file, setFile] = useState<File | undefined>(undefined)
 	const [conversionResult, setRes] = useState<[string, Blob, {
