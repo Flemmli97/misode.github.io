@@ -1,10 +1,11 @@
 
 import * as zip from '@zip.js/zip.js'
+import { checkVersion, VersionId } from '../../services/index.js'
 
 const questDir = "simplequests"
 const catDir = "simplequests_categories"
 
-export async function convert(input: File): Promise<[Blob, { [file: string]: string[] }]> {
+export async function convert(input: File, version: VersionId): Promise<[Blob, { [file: string]: string[] }]> {
 	const reader = new zip.ZipReader(new zip.BlobReader(new Blob([input])))
 	const entries = await reader.getEntries()
 	const writer = new zip.ZipWriter(new zip.BlobWriter('application/zip'))
@@ -22,7 +23,7 @@ export async function convert(input: File): Promise<[Blob, { [file: string]: str
 				return
 			}
 			const fileErrors: string[] = []
-			let conv = e.filename.includes(catDir) ? convertCat(data, fileErrors) : convertQuest(data, fileErrors)
+			let conv = e.filename.includes(catDir) ? convertCat(data, version, fileErrors) : convertQuest(data, version, fileErrors)
 			if (fileErrors.length > 0)
 				errors[e.filename] = fileErrors
 			await writer.add(e.filename, new zip.TextReader(conv))
@@ -36,12 +37,25 @@ export async function convert(input: File): Promise<[Blob, { [file: string]: str
 const EntryConverter_2_0_0: {
 	[type: string]: (input: any, errors: string[]) => any
 } = {
-	"simplequests:advancement": (input, _err) => replace(input, k => k === "advancement" ? "advancements" : k,
-		(k, v) => k === "advancement" ? [v] : v
-	),
-	"simplequests:multi_advancements": (input, _err) => replace(input, k => k,
-		(k, v) => k === "id" ? "simplequests:advancement" : v
-	),
+	"simplequests:advancement": (input, _err) => {
+		const res = replaceWith(input, { "advancement": "advancements" })
+		res.advancements = [{
+			description: undefined,
+			value: res.advancements
+		}]
+		return res
+	},
+	"simplequests:multi_advancements": (input, _err) => {
+		const res = replaceWith(input, {})
+		const locs = res.advancements as any[]
+		res.advancements = locs.map(v => {
+			return {
+				description: undefined,
+				value: v
+			}
+		})
+		return res
+	},
 	"simplequests:block_interact": (input, _err) => {
 		const res = replaceWith(input, { "consumeItem": "consume", "block": "block_predicates", "item": "item_predicates" })
 		res.block_predicates = [{
@@ -276,7 +290,7 @@ const EntryConverter_2_0_0: {
 
 const replacement: { [key: string]: string } = { "task": "name" }
 
-function convertQuest(input: string, errors: string[]): string {
+function convertQuest(input: string, version: VersionId, errors: string[]): string {
 	const obj = JSON.parse(input)
 	const res: any = {}
 	Object.keys(obj).forEach(key => {
@@ -292,7 +306,7 @@ function convertQuest(input: string, errors: string[]): string {
 			res[toSnakeCase(key)] = obj[key]
 	})
 	if ("icon" in res) {
-		res.icon = replaceWith(res.icon, { "count": "Count" })
+		obj.icon = convertItem(obj.icon, version)
 	}
 	return JSON.stringify(res, undefined, 2).replace("simplequests:context_multiplier", "simplequests_api:context_multiplier")
 }
@@ -330,10 +344,21 @@ function replace(obj: any, mapper: (key: string) => string, value?: (key: string
 	return res
 }
 
-function convertCat(input: string, _errors: string[]): string {
+function convertCat(input: string, version: VersionId, _errors: string[]): string {
 	const obj = JSON.parse(input)
 	if ("icon" in obj) {
-		obj.icon = replaceWith(obj.icon, { "count": "Count" })
+		obj.icon = convertItem(obj.icon, version)
 	}
 	return JSON.stringify(obj, undefined, 2)
+}
+
+function convertItem(item: any, version: VersionId) {
+	if (typeof item === "string") {
+		return {
+			id: item
+		}
+	} else if(checkVersion(version, undefined, "1.20.6")) {
+		return replaceWith(item, { "count": "Count" })
+	}
+	return item;
 }

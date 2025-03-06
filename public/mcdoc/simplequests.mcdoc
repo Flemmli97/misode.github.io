@@ -23,11 +23,6 @@ type DescriptiveValue<C> = struct {
 	value: C,
 }
 
-type OptionalDescriptiveValue<C> = (C | struct {
-	description: string,
-	value: C,
-})
-
 type NumberProvider = (
 	float |
 	struct {
