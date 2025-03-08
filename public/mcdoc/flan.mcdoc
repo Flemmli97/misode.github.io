@@ -1,4 +1,4 @@
-use ::java::server::world::item::ItemStack
+use ::java::world::item::ItemStack
 
 dispatch minecraft:resource[flan:permission] to struct {
     gui_item: ItemStack,

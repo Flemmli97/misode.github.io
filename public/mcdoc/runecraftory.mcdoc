@@ -1,6 +1,6 @@
 use ::java::data::advancement::predicate::EntityPredicate
 use ::java::data::advancement::predicate::ItemPredicate
-use ::java::server::world::item::ItemStack
+use ::java::world::item::ItemStack
 use ::java::data::util::NumberProvider
 
 dispatch minecraft:resource[runecraftory:crops] to struct Crops {

@@ -3,7 +3,7 @@ use ::java::data::advancement::predicate::ItemPredicate
 use ::java::data::advancement::predicate::LocationPredicate
 use ::java::server::world::item::DataComponentPatch
 use ::java::data::advancement::predicate::BlockPredicate
-use ::java::server::world::item::ItemStack
+use ::java::world::item::ItemStack
 
 dispatch minecraft:resource[simplequests:quest_category] to struct QuestCategory {
 	name: string,
