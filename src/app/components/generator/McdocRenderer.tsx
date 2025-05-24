@@ -127,7 +127,6 @@ function Body({ type, optional, node, ctx }: Props<SimplifiedMcdocType>) {
 			<TupleBody type={type} node={node} ctx={ctx} />
 		</div>
 	}
-	console.error("type ", type, type.kind)
 	if (type.kind === 'any' || type.kind === 'unsafe') {
 		return <AnyBody type={type} optional={optional} node={node} ctx={ctx} />
 	}

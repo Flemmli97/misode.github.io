@@ -93,14 +93,8 @@ dispatch simplequests:entry[simplequests_api:predicates] to struct PredicateTask
 	submit: boolean,
 }
 
-// TODO regex
-// const DATE = new RegExp("^(?:(?<weeks>[0-9]{1,2})w)?" +
-// 	"(?:(?:^|:)(?<days>[0-9])d)?" +
-// 	"(?:(?:^|:)(?<hours>[0-9]{1,2})h)?" +
-// 	"(?:(?:^|:)(?<minutes>[0-9]{1,2})m)?" +
-// 	"(?:(?:^|:)(?<seconds>[0-9]{1,2})s)?$")
 type Time = (
-// #[match_regex=(regex="^(?:(?<weeks>[0-9]{1,2})w)?(?:(?:^|:)(?<days>[0-9])d)?(?:(?:^|:)(?<hours>[0-9]{1,2})h)?(?:(?:^|:)(?<minutes>[0-9]{1,2})m)?(?:(?:^|:)(?<seconds>[0-9]{1,2})s)?$", error="error.invalid.value.time")]
+	#[match_regex=(pattern="^(?:(?<weeks>[0-9]{1,2})w)?(?:(?:^|:)(?<days>[0-9])d)?(?:(?:^|:)(?<hours>[0-9]{1,2})h)?(?:(?:^|:)(?<minutes>[0-9]{1,2})m)?(?:(?:^|:)(?<seconds>[0-9]{1,2})s)?$", error="error.invalid.value.time")]
 	string | 
 	#[name="timeInTicks"]
 	int
