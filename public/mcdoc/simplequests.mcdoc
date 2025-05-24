@@ -116,7 +116,7 @@ struct QuestTasksMap {
 
 enum(string) QuestEntryTypes {
 	#[starred] ItemTask = "simplequests_api:item",
-	#[starred] KillTask = "simplequests_api:entity",
+	#[starred] KillTask = "simplequests_api:kill",
 	AdvancementTask = "simplequests_api:advancement",
 	BlockInteractTask = "simplequests_api:block_interact",
 	CraftingTask = "simplequests_api:crafting",
