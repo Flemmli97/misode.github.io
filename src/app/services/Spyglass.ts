@@ -12,12 +12,10 @@ import { TextDocument } from 'vscode-languageserver-textdocument'
 import type { ConfigGenerator } from '../Config.js'
 import siteConfig from '../Config.js'
 import { computeIfAbsent, genPath } from '../Utils.js'
-import type { VersionMeta } from './DataFetcher.js'
-import { fetchBlockStates, fetchRegistries, fetchVersions, fetchWithCache, getVersionChecksum } from './DataFetcher.js'
+import type { VanillaMcdocSymbols, VersionMeta } from './DataFetcher.js'
+import { fetchBlockStates, fetchRegistries, fetchVanillaMcdoc, fetchVersions, getVersionChecksum } from './DataFetcher.js'
 import { IndexedDbFileSystem } from './FileSystem.js'
 import type { VersionId } from './Versions.js'
-
-const SPYGLASS_API = 'https://api.spyglassmc.com'
 
 export const CACHE_URI = 'file:///cache/'
 export const ROOT_URI = 'file:///root/'
@@ -29,7 +27,7 @@ export const DRAFTS_URI = `${ROOT_URI}drafts/`
 const INITIAL_DIRS = [CACHE_URI, ROOT_URI, DEPENDENCY_URI, UNSAVED_URI, PROJECTS_URI, DRAFTS_URI]
 
 const builtinMcdoc = `
-use ::java::server::util::text::Text
+use ::java::util::text::Text
 use ::java::data::worldgen::dimension::Dimension
 
 dispatch minecraft:resource[text_component] to Text
@@ -259,7 +257,7 @@ export class SpyglassService {
 			return `${UNSAVED_URI}pack.mcmeta`
 		}
 		const pack = gen.tags?.includes('assets') ? 'assets' : 'data'
-		return `${UNSAVED_URI}${pack}/draft/${genPath(gen, this.version)}/draft.json`
+		return `${UNSAVED_URI}${pack}/draft/${genPath(gen, this.version)}/draft${gen.ext ?? '.json'}`
 	}
 
 	public watchFile(uri: string, handler: (docAndNode: core.DocAndNode) => void) {
@@ -369,10 +367,10 @@ async function compressBall(files: [string, string][]): Promise<Uint8Array> {
 const initialize: core.ProjectInitializer = async (ctx) => {
 	const { config, logger, meta, externals, cacheRoot } = ctx
 
-	const vanillaMcdocRes = await fetchWithCache(`${SPYGLASS_API}/vanilla-mcdoc/symbols`)
+	const vanillaMcdoc = await fetchVanillaMcdoc()
 	meta.registerSymbolRegistrar('vanilla-mcdoc', {
-		checksum: vanillaMcdocRes.headers.get('ETag') ?? '',
-		registrar: vanillaMcdocRegistrar(await vanillaMcdocRes.json()),
+		checksum: vanillaMcdoc.ref,
+		registrar: vanillaMcdocRegistrar(vanillaMcdoc),
 	})
 
 	meta.registerDependencyProvider('@misode-mcdoc', async () => {
@@ -411,7 +409,7 @@ const initialize: core.ProjectInitializer = async (ctx) => {
 
 	registerAttributes(meta, release, versions)
 
-	json.initialize(ctx)
+	json.getInitializer()(ctx)
 	je.json.initialize(ctx)
 	je.mcf.initialize(ctx, summary.commands, release)
 	nbt.initialize(ctx)
@@ -481,10 +479,6 @@ function registerAttributes(meta: core.MetaRegistry, release: ReleaseVersion, ve
 
 const VanillaMcdocUri = 'mcdoc://vanilla-mcdoc/symbols.json'
 
-interface VanillaMcdocSymbols {
-	mcdoc: Record<string, unknown>,
-	'mcdoc/dispatcher': Record<string, Record<string, unknown>>,
-}
 function vanillaMcdocRegistrar(vanillaMcdoc: VanillaMcdocSymbols): core.SymbolRegistrar {
 	return (symbols) => {
 		const start = performance.now()
