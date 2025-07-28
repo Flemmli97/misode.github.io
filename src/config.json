@@ -954,129 +954,169 @@
       "minVersion": "1.21.1"
     },
     {
-      "id": "flan:permission",
-      "url": "flan/permission",
-      "path": "claim_permission",
+      "id": "flan:permission_legacy",
+      "url": "flan/permission_legacy",
+      "path": "claim_permissions",
       "tags": ["partners"],
       "dependency": "flan",
       "minVersion": "1.18.2",
+      "maxVersion": "1.20",
+      "wiki": "https://github.com/Flemmli97/Flan/wiki"
+    },
+    {
+      "id": "flan:override_legacy",
+      "url": "flan/override_legacy",
+      "path": "claim_interactions_override",
+      "tags": ["partners"],
+      "dependency": "flan",
+      "minVersion": "1.18.2",
+      "maxVersion": "1.20",
+      "wiki": "https://github.com/Flemmli97/Flan/wiki"
+    },
+    {
+      "id": "flan:permission",
+      "url": "flan/permission",
+      "path": "flan/claim_permission",
+      "tags": ["partners"],
+      "dependency": "flan",
+      "minVersion": "1.21",
       "wiki": "https://github.com/Flemmli97/Flan/wiki"
     },
     {
       "id": "flan:override",
       "url": "flan/override",
-      "path": "claim_interactions_override",
+      "path": "flan/claim_interactions_override",
       "tags": ["partners"],
       "dependency": "flan",
-      "minVersion": "1.18.2",
+      "minVersion": "1.21",
       "wiki": "https://github.com/Flemmli97/Flan/wiki"
     },
     {
       "id": "runecraftory:crops",
       "url": "runecraftory/crops",
-      "path": "crops",
+      "path": "runecraftory/crops_properties",
       "tags": ["partners"],
       "dependency": "runecraftory",
-      "minVersion": "1.18.2",
+      "minVersion": "1.21.1",
       "wiki": "https://github.com/Flemmli97/RuneCraftory/wiki"
     },
     {
       "id": "runecraftory:food",
       "url": "runecraftory/food",
-      "path": "food",
+      "path": "runecraftory/food_stats",
       "tags": ["partners"],
       "dependency": "runecraftory",
-      "minVersion": "1.18.2",
+      "minVersion": "1.21.1",
       "wiki": "https://github.com/Flemmli97/RuneCraftory/wiki"
     },
     {
       "id": "runecraftory:item_stats",
       "url": "runecraftory/item_stats",
-      "path": "item_stats",
+      "path": "runecraftory/item_stats",
       "tags": ["partners"],
       "dependency": "runecraftory",
-      "minVersion": "1.18.2",
+      "minVersion": "1.21.1",
       "wiki": "https://github.com/Flemmli97/RuneCraftory/wiki"
     },
     {
       "id": "runecraftory:gate_spawning",
       "url": "runecraftory/gate_spawning",
-      "path": "gate_spawning",
+      "path": "runecraftory/gate_spawning",
       "tags": ["partners"],
       "dependency": "runecraftory",
-      "minVersion": "1.18.2",
+      "minVersion": "1.21.1",
       "wiki": "https://github.com/Flemmli97/RuneCraftory/wiki"
     },
     {
       "id": "runecraftory:shop_items",
       "url": "runecraftory/shop_items",
-      "path": "shop_items",
+      "path": "runecraftory/shop_items",
       "tags": ["partners"],
       "dependency": "runecraftory",
-      "minVersion": "1.18.2",
+      "minVersion": "1.21.1",
       "wiki": "https://github.com/Flemmli97/RuneCraftory/wiki"
     },
     {
       "id": "runecraftory:npc_actions",
       "url": "runecraftory/npc_actions",
-      "path": "npc_actions",
+      "path": "runecraftory/npc_actions",
       "tags": ["partners"],
       "dependency": "runecraftory",
-      "minVersion": "1.18.2",
+      "minVersion": "1.21.1",
       "wiki": "https://github.com/Flemmli97/RuneCraftory/wiki"
     },
     {
       "id": "runecraftory:conversations",
       "url": "runecraftory/conversations",
-      "path": "conversations",
+      "path": "runecraftory/conversations",
       "tags": ["partners"],
       "dependency": "runecraftory",
-      "minVersion": "1.18.2",
+      "minVersion": "1.21.1",
       "wiki": "https://github.com/Flemmli97/RuneCraftory/wiki"
     },
     {
       "id": "runecraftory:npc_data",
       "url": "runecraftory/npc_data",
-      "path": "npc_data",
+      "path": "runecraftory/npc_data",
       "tags": ["partners"],
       "dependency": "runecraftory",
-      "minVersion": "1.18.2",
+      "minVersion": "1.21.1",
       "wiki": "https://github.com/Flemmli97/RuneCraftory/wiki"
     },
     {
       "id": "runecraftory:gift_data",
       "url": "runecraftory/gift_data",
-      "path": "gift_data",
+      "path": "runecraftory/npc_gifts",
       "tags": ["partners"],
       "dependency": "runecraftory",
-      "minVersion": "1.18.2",
+      "minVersion": "1.21.1",
       "wiki": "https://github.com/Flemmli97/RuneCraftory/wiki"
     },
     {
       "id": "runecraftory:npc_looks",
       "url": "runecraftory/npc_looks",
-      "path": "npc_looks",
+      "path": "runecraftory/npc_looks",
       "tags": ["partners"],
       "dependency": "runecraftory",
-      "minVersion": "1.18.2",
+      "minVersion": "1.21.1",
       "wiki": "https://github.com/Flemmli97/RuneCraftory/wiki"
     },
     {
-      "id": "simplequests:quest_category",
-      "url": "simplequests/quest-category",
+      "id": "simplequests:category_legacy",
+      "url": "simplequests/category_legacy",
+      "path": "simplequests_categories",
+      "tags": ["partners"],
+      "dependency": "simplequests",
+      "minVersion": "1.18.2",
+      "maxVersion": "1.20",
+      "wiki": "https://github.com/Flemmli97/SimpleQuests/wiki"
+    },
+    {
+      "id": "simplequests:quest_legacy",
+      "url": "simplequests/quest_legacy",
       "path": "simplequests",
       "tags": ["partners"],
       "dependency": "simplequests",
       "minVersion": "1.18.2",
+      "maxVersion": "1.20",
+      "wiki": "https://github.com/Flemmli97/SimpleQuests/wiki"
+    },
+    {
+      "id": "simplequests:category",
+      "url": "simplequests/category",
+      "path": "simplequests/category",
+      "tags": ["partners"],
+      "dependency": "simplequests",
+      "minVersion": "1.21",
       "wiki": "https://github.com/Flemmli97/SimpleQuests/wiki"
     },
     {
       "id": "simplequests:quest",
       "url": "simplequests/quest",
-      "path": "simplequests_categories",
+      "path": "simplequests/quest",
       "tags": ["partners"],
       "dependency": "simplequests",
-      "minVersion": "1.18.2",
+      "minVersion": "1.21",
       "wiki": "https://github.com/Flemmli97/SimpleQuests/wiki"
     }
   ],

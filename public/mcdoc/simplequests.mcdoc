@@ -5,7 +5,7 @@ use ::java::server::world::item::DataComponentPatch
 use ::java::data::advancement::predicate::BlockPredicate
 use ::java::world::item::ItemStack
 
-dispatch minecraft:resource[simplequests:quest_category] to struct QuestCategory {
+struct QuestCategory {
 	name: string,
 	description?: [string],
 	icon?: ItemStack,
@@ -17,6 +17,10 @@ dispatch minecraft:resource[simplequests:quest_category] to struct QuestCategory
 	is_silent?: boolean,
 	required_contexts?: [string],
 }
+
+dispatch minecraft:resource[simplequests:category] to QuestCategory
+
+dispatch minecraft:resource[simplequests:category_legacy] to QuestCategory
 
 type DescriptiveValue<C> = struct {
 	description: string,
@@ -141,7 +145,7 @@ dispatch simplequests:quests[simplequests_api:sequential_quest] to struct Sequen
 	quests: [#[id] string] @ 1..,
 }
 
-dispatch minecraft:resource[simplequests:quest] to struct QuestBase {
+struct QuestBase {
 	category?: #[id="simplequests:quest_category"] string,
 	name: string,
 	description?: [string],
@@ -159,6 +163,10 @@ dispatch minecraft:resource[simplequests:quest] to struct QuestBase {
 	type: (#[name="Builtin"] QuestTypes | string),
 	...simplequests:quests[[type]],
 }
+
+dispatch minecraft:resource[simplequests:quest] to QuestBase
+
+dispatch minecraft:resource[simplequests:quest_legacy] to QuestBase
 
 enum(string) QuestTypes {
 	#[starred] Quest = "simplequests_api:quest",

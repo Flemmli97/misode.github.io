@@ -1,6 +1,6 @@
 use ::java::world::item::ItemStack
 
-dispatch minecraft:resource[flan:permission] to struct {
+struct Permission {
     gui_item: ItemStack,
     default_value: boolean,
     global: boolean,
@@ -8,10 +8,16 @@ dispatch minecraft:resource[flan:permission] to struct {
 	required_mod?: string
 }
 
-dispatch minecraft:resource[flan:override] to struct {
+dispatch minecraft:resource[flan:permission] to Permission
+dispatch minecraft:resource[flan:permission_legacy] to Permission
+
+struct Override {
     type: #[id] OverrideTypes,
     ...flan:overrides[[type]],
 }
+
+dispatch minecraft:resource[flan:override] to Override
+dispatch minecraft:resource[flan:override_legacy] to Override
 
 enum(string) OverrideTypes {
 	BlockLeftClick = "flan:block_left_click",
