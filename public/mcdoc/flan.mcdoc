@@ -4,6 +4,8 @@ struct Permission {
     gui_item: ItemStack,
     default_value: boolean,
     global: boolean,
+	global_default_value: boolean,
+	require_explicit: boolean,
 	order: int,
 	required_mod?: string
 }
@@ -76,7 +78,6 @@ dispatch flan:builtin_permissions[
 	flan:target_block,
 	flan:projectiles,
 	flan:trample,
-	flan:minecart,
 	flan:portal,
 	flan:raid,
 	flan:boat,
@@ -94,10 +95,13 @@ dispatch flan:builtin_permissions[
 	flan:drop,
 	flan:pickup,
 	flan:flight,
+	flan:may_flight,
 	flan:can_stay,
 	flan:teleport,
 	flan:no_hunger,
 	flan:claim_message,
+	flan:archeology,
+	flan:wind_charge,
 
 	flan:hurt_player,
 	flan:explosions,
@@ -112,6 +116,8 @@ dispatch flan:builtin_permissions[
 	flan:lightning,
 	flan:lock_items,
 	flan:fake_player,
+	flan:player_mob_spawn,
+	flan:sculk,
 ] to struct {}
 
 #[until="1.21"]

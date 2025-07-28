@@ -36,7 +36,7 @@ dispatch minecraft:resource[runecraftory:food] to struct Food {
 	potion_remove:  [#[id="mob_effect"] string],
 }
 
-dispatch minecraft:resource[runecraftory:item_stats] to struct ItemStats {
+dispatch minecraft:resource[runecraftory:item_property] to struct ItemStats {
 	item: #[id=(registry="item", tags="allowed")] string,
 	buy_price:  int @ 0..,
 	sell_price:  int @ 0..,
@@ -57,7 +57,7 @@ dispatch minecraft:resource[runecraftory:item_stats] to struct ItemStats {
 type StructureID = (#[until="1.19"] #[id="worldgen/configured_structure_feature"] string |
 		 #[since="1.19"] #[id="worldgen/structure"] string)
 
-dispatch minecraft:resource[runecraftory:gate_spawning] to struct GateSpawning {
+dispatch minecraft:resource[runecraftory:gate_spawn] to struct GateSpawning {
 	entity: #[id=(registry="entity", tags="allowed")] string,
 	min_distance_from_spawn:  int @ 0..,
 	min_gate_level:  int @ 0..,
@@ -72,7 +72,7 @@ dispatch minecraft:resource[runecraftory:gate_spawning] to struct GateSpawning {
 	player_predicate?:  EntityPredicate,
 }
 
-dispatch minecraft:resource[runecraftory:shop_items] to struct ShopItems {
+dispatch minecraft:resource[runecraftory:shop_item] to struct ShopItems {
 	replace: boolean,
 	values: [ShopItemsContent],
 }
@@ -127,7 +127,7 @@ dispatch runecraftory:npc_actions[runecraftory:run_to_leader] to struct {
 	cooldown: NumberProvider,
 }
 
-dispatch minecraft:resource[runecraftory:npc_actions] to struct NPCActions {
+dispatch minecraft:resource[runecraftory:npc_action] to struct NPCActions {
 	actions: [struct {
 		weight: int @ 1..,
 		predicate?: EntityPredicate,
@@ -138,7 +138,7 @@ dispatch minecraft:resource[runecraftory:npc_actions] to struct NPCActions {
 	}],
 }
 
-dispatch minecraft:resource[runecraftory:conversations] to struct Conversation {
+dispatch minecraft:resource[runecraftory:conversation] to struct Conversation {
 	fallback_key:  string,
 	conversations: struct {
 		[string]: struct {
@@ -221,7 +221,7 @@ dispatch minecraft:resource[runecraftory:npc_data] to struct NPCData {
 	},
 }
 
-dispatch minecraft:resource[runecraftory:gift_data] to struct GiftData {
+dispatch minecraft:resource[runecraftory:npc_gift] to struct GiftData {
 	items: [#[id=(registry="item", tags="allowed")] string],
 	xp_range: struct {
 		min?: int,
@@ -230,7 +230,7 @@ dispatch minecraft:resource[runecraftory:gift_data] to struct GiftData {
 	translations: [string] @ 1..,
 }
 
-dispatch minecraft:resource[runecraftory:npc_looks] to struct NPCLook {
+dispatch minecraft:resource[runecraftory:npc_look] to struct NPCLook {
 	player_skin?: string,
 	gender?: ("UNDEFINED" | "MALE" | "FEMALE"),
 	weight: int @ 0..,
@@ -304,6 +304,13 @@ dispatch runecraftory:npc_look_feature[runecraftory:simple_hat_feature] to [stri
 dispatch runecraftory:npc_look_feature[runecraftory:slim_feature] to struct {}
 dispatch runecraftory:npc_look_feature[runecraftory:size_feature] to struct {
 	size: NumberProvider,
+}
+dispatch runecraftory:npc_look_feature[runecraftory:model_feature] to struct {
+	models: [{
+		model: #[id] string,
+		textures: [#[id] string]
+	}],
+	location: ("HEAD" | "BODY" | "LEFT_ARM" | "RIGHT_ARM" | "LEFT_LEG" | "RIGHT_LEG")
 }
 
 // ===== Registry stuff =====
