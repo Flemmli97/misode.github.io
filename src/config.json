@@ -1121,7 +1121,7 @@
       "dependency": "flan",
       "minVersion": "1.18.2",
       "maxVersion": "1.20",
-      "wiki": "https://github.com/Flemmli97/Flan/wiki"
+      "wiki": "https://wiki.blazing-coop.net/flan/dev/Custom%20Permission"
     },
     {
       "id": "flan:override_legacy",
@@ -1131,7 +1131,7 @@
       "dependency": "flan",
       "minVersion": "1.18.2",
       "maxVersion": "1.20",
-      "wiki": "https://github.com/Flemmli97/Flan/wiki"
+      "wiki": "https://wiki.blazing-coop.net/flan/dev/Interaction%20Overrides"
     },
     {
       "id": "flan:permission",
@@ -1140,7 +1140,7 @@
       "tags": ["partners"],
       "dependency": "flan",
       "minVersion": "1.21",
-      "wiki": "https://github.com/Flemmli97/Flan/wiki"
+      "wiki": "https://wiki.blazing-coop.net/flan/dev/Custom%20Permission"
     },
     {
       "id": "flan:override",
@@ -1149,7 +1149,7 @@
       "tags": ["partners"],
       "dependency": "flan",
       "minVersion": "1.21",
-      "wiki": "https://github.com/Flemmli97/Flan/wiki"
+      "wiki": "https://wiki.blazing-coop.net/flan/dev/Interaction%20Overrides"
     },
     {
       "id": "runecraftory:crops",
@@ -1249,7 +1249,7 @@
       "dependency": "simplequests",
       "minVersion": "1.18.2",
       "maxVersion": "1.20",
-      "wiki": "https://github.com/Flemmli97/SimpleQuests/wiki"
+      "wiki": "https://wiki.blazing-coop.net/simplequests/pre-2.0.0/Category"
     },
     {
       "id": "simplequests:quest_legacy",
@@ -1259,7 +1259,7 @@
       "dependency": "simplequests",
       "minVersion": "1.18.2",
       "maxVersion": "1.20",
-      "wiki": "https://github.com/Flemmli97/SimpleQuests/wiki"
+      "wiki": "https://wiki.blazing-coop.net/simplequests/pre-2.0.0/Quests"
     },
     {
       "id": "simplequests:category",
@@ -1268,7 +1268,7 @@
       "tags": ["partners"],
       "dependency": "simplequests",
       "minVersion": "1.21",
-      "wiki": "https://github.com/Flemmli97/SimpleQuests/wiki"
+      "wiki": "https://wiki.blazing-coop.net/simplequests/quests/Category"
     },
     {
       "id": "simplequests:quest",
@@ -1277,7 +1277,7 @@
       "tags": ["partners"],
       "dependency": "simplequests",
       "minVersion": "1.21",
-      "wiki": "https://github.com/Flemmli97/SimpleQuests/wiki"
+      "wiki": "https://wiki.blazing-coop.net/simplequests/quests"
     },
     {
       "id": "smart_keep_inventory:condition",
