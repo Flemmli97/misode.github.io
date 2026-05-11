@@ -1,0 +1,24 @@
+use ::java::data::advancement::predicate::EntityPredicate
+use ::java::data::advancement::predicate::ItemPredicate
+use ::java::data::advancement::predicate::DamageSourcePredicate
+
+type EntityHolderSet = (#[id(registry="entity_type",tags="allowed")] string | [#[id="entity_type"] string])
+
+dispatch minecraft:resource[equal_loot:entity] to struct Condition {
+	/// A tag or list of entities that apply to this config
+  	include: EntityHolderSet,
+	/// A tag or list of entities that are excluded from this config
+  	exclude: EntityHolderSet,
+	/// The amount of players that can receive the loot at max. Set to 0 to have no limit
+  	max_players: int,
+	/// The minimum damage a player needs to do to count
+  	min_damage: float,
+  	/// If true min_damage is treated as a percentage value based on the mobs max health. Otherwise min_damage is the flat amount of damage required
+	percentage: boolean,
+  	/// Time in ticks the player needed to hit the mobs within to count. So if the player hasnt hit the mob in this time they wont receive the loot
+	damaged_within: int,
+  	/// How the loot of the killing player should be handled. See below
+	killer_handling: "always" | "fill" | "requirements",
+	/// Only relevant if a config overlaps with another. This defines which config will take precedence then
+  	priority: int,
+}

@@ -1286,6 +1286,15 @@
       "tags": ["partners"],
       "dependency": "smart_keep_inventory",
       "minVersion": "1.21",
+      "wiki": "https://www.curseforge.com/minecraft/mc-mods/smart-keep-inventory"
+    },
+    {
+      "id": "equal_loot:entity",
+      "url": "equal_loot:entity",
+      "path": "equal_loot/entity",
+      "tags": ["partners"],
+      "dependency": "equal_loot",
+      "minVersion": "1.21",
       "wiki": "https://www.curseforge.com/minecraft/mc-mods/equal-loot"
     }
   ],
