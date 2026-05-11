@@ -1,0 +1,49 @@
+use ::java::data::advancement::predicate::EntityPredicate
+use ::java::data::advancement::predicate::ItemPredicate
+use ::java::data::advancement::predicate::DamageSourcePredicate
+
+type EntityTypeValue = #[id(registry="entity_type",tags="allowed")] string
+
+type BlockHolderSet = ([#[id="block"] string] | #[id(registry="block",tags="allowed")] string)
+
+struct DifficultyAttributeProperty {
+	attributes: struct {
+		[#[id(registry="attribute")] string]: struct {
+			operation: ("add_value" | "add_multiplied_base" | "add_multiplied_total"),
+			expression: string,
+		},
+	},
+	additional: struct {
+		[("MAGIC_RESISTANCE" | "PROJECTILE_DAMAGE_MULTIPLIER" | "EXPLOSION_DAMAGE_MULTIPLIER")]: string
+	},
+}
+
+type ConfigurableProperty<P> = struct {
+	val: P,
+	replace: boolean,
+}
+
+enum(string) DifficultyFeatures {
+    ALL = "ALL",
+    REVERSE = "REVERSE",
+    ATTRIBUTES = "ATTRIBUTES",
+    ARMOR = "ARMOR",
+    HELDITEMS = "HELDITEMS",
+    BLOCKBREAK = "BLOCKBREAK",
+    USEITEM = "USEITEM",
+    LADDER = "LADDER",
+    STEAL = "STEAL",
+    GUARDIAN = "GUARDIAN",
+    FLYING = "FLYING",
+    TARGETVILLAGER = "TARGETVILLAGER",
+    NEUTRALAGGRO = "NEUTRALAGGRO",
+}
+
+
+dispatch minecraft:resource[improved_mobs:entity_configs] to struct EntityConfig {
+    /// Either a tag, an id, or a mod id. If using a mod id you will get a warning but you can ignore it.
+	type: EntityTypeValue, 
+	enabledFeatures?: [DifficultyFeatures],
+    breakableBlocks: ConfigurableProperty<BlockHolderSet>,
+    attributes: ConfigurableProperty<DifficultyAttributeProperty>,
+}

@@ -1296,6 +1296,15 @@
       "dependency": "equal_loot",
       "minVersion": "1.21",
       "wiki": "https://www.curseforge.com/minecraft/mc-mods/equal-loot"
+    },
+    {
+      "id": "improved_mobs:entity_configs",
+      "url": "improved_mobs:entity_configs",
+      "path": "improved_mobs/entity_configs",
+      "tags": ["partners"],
+      "dependency": "improved_mobs",
+      "minVersion": "1.21",
+      "wiki": "https://wiki.blazing-coop.net/improvedmobs/Datadriven%20configs#mob-specific-overrides"
     }
   ],
   "legacyGuides": [

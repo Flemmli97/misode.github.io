@@ -12,5 +12,5 @@ dispatch minecraft:resource[smart_keep_inventory:condition] to struct Condition 
 	/// Default true. Whether to also keep the players experiences or not
 	keepExperience?: boolean, 
 	/// Optional. Only used to disable an EXISTING condition with the same id
-	disabled?: boolean
+	disabled?: boolean,
 }
