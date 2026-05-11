@@ -1278,6 +1278,15 @@
       "dependency": "simplequests",
       "minVersion": "1.21",
       "wiki": "https://github.com/Flemmli97/SimpleQuests/wiki"
+    },
+    {
+      "id": "smart_keep_inventory:condition",
+      "url": "smart_keep_inventory:condition",
+      "path": "smart_keep_inventory/condition",
+      "tags": ["partners"],
+      "dependency": "smart_keep_inventory",
+      "minVersion": "1.21",
+      "wiki": "https://www.curseforge.com/minecraft/mc-mods/equal-loot"
     }
   ],
   "legacyGuides": [

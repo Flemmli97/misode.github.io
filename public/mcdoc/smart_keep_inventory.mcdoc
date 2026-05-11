@@ -1,0 +1,16 @@
+use ::java::data::advancement::predicate::EntityPredicate
+use ::java::data::advancement::predicate::ItemPredicate
+use ::java::data::advancement::predicate::DamageSourcePredicate
+
+dispatch minecraft:resource[smart_keep_inventory:condition] to struct Condition {
+	/// Optional. This is the player that died
+	player?: EntityPredicate,
+	/// Optional. The entity that killed the player. Directly or indirectly
+	killer?: EntityPredicate,
+	/// Optional. The damagesource that killed the player
+	damage?: DamageSourcePredicate,
+	/// Default true. Whether to also keep the players experiences or not
+	keepExperience?: boolean, 
+	/// Optional. Only used to disable an EXISTING condition with the same id
+	disabled?: boolean
+}
