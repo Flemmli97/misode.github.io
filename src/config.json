@@ -191,9 +191,37 @@
     },
     {
       "id": "1.21.6",
-      "ref": "1.21.7",
-      "name": "1.21.6 — 1.21.7",
+      "ref": "1.21.8",
+      "name": "1.21.6 — 1.21.8",
       "pack_format": 81,
+      "show": true
+    },
+    {
+      "id": "1.21.9",
+      "ref": "1.21.10",
+      "name": "1.21.9 — 1.21.10",
+      "pack_format": 88,
+      "show": true
+    },
+    {
+      "id": "1.21.11",
+      "ref": "1.21.11",
+      "name": "1.21.11",
+      "pack_format": 94,
+      "show": true
+    },
+    {
+      "id": "26.1",
+      "ref": "26.1.1",
+      "name": "26.1",
+      "pack_format": 101,
+      "show": true
+    },
+    {
+      "id": "26.2",
+      "dynamic": true,
+      "name": "26.2",
+      "pack_format": 102,
       "show": true
     }
   ],
@@ -217,12 +245,12 @@
     {
       "id": "advancement",
       "url": "advancement",
-      "wiki": "https://minecraft.wiki/w/Custom_advancement"
+      "wiki": "https://minecraft.wiki/w/Advancement_definition"
     },
     {
       "id": "recipe",
       "url": "recipe",
-      "wiki": "https://minecraft.wiki/w/Recipe#JSON_format"
+      "wiki": "https://minecraft.wiki/w/Recipe_(Java_Edition)#JSON_format"
     },
     {
       "id": "chat_type",
@@ -250,7 +278,7 @@
       "id": "banner_pattern",
       "url": "banner-pattern",
       "minVersion": "1.20.5",
-      "wiki": "https://minecraft.wiki/w/Banner/Patterns#JSON_Format"
+      "wiki": "https://minecraft.wiki/w/Banner_pattern_definition"
     },
     {
       "id": "wolf_variant",
@@ -267,7 +295,7 @@
       "id": "enchantment",
       "url": "enchantment",
       "minVersion": "1.21",
-      "wiki": "https://minecraft.wiki/w/Custom_enchantment"
+      "wiki": "https://minecraft.wiki/w/Enchantment_definition"
     },
     {
       "id": "enchantment_provider",
@@ -279,7 +307,7 @@
       "id": "painting_variant",
       "url": "painting-variant",
       "minVersion": "1.21",
-      "wiki": "https://minecraft.wiki/w/Painting_variant"
+      "wiki": "https://minecraft.wiki/w/Painting_variant_definition"
     },
     {
       "id": "jukebox_song",
@@ -348,22 +376,45 @@
       "wiki": "https://minecraft.wiki/w/Test_environment_definition"
     },
     {
+      "id": "timeline",
+      "url": "timeline",
+      "minVersion": "1.21.11",
+      "wiki": "https://minecraft.wiki/w/Timeline"
+    },
+    {
+      "id": "zombie_nautilus_variant",
+      "url": "zombie-nautilus-variant",
+      "minVersion": "1.21.11"
+    },
+    {
+      "id": "villager_trade",
+      "url": "villager-trade",
+      "minVersion": "26.1",
+      "wiki": "https://minecraft.wiki/w/Villager_trade_definition"
+    },
+    {
+      "id": "trade_set",
+      "url": "trade-set",
+      "minVersion": "26.1",
+      "wiki": "https://minecraft.wiki/w/Trade_set"
+    },
+    {
       "id": "text_component",
       "url": "text-component",
       "noPath": true,
-      "wiki": "https://minecraft.wiki/w/Raw_JSON_text_format#Java_Edition"
+      "wiki": "https://minecraft.wiki/w/Text_component_format#Java_Edition"
     },
     {
       "id": "pack_mcmeta",
       "url": "pack-mcmeta",
-      "wiki": "https://minecraft.wiki/w/Data_pack#pack.mcmeta"
+      "wiki": "https://minecraft.wiki/w/pack.mcmeta"
     },
     {
       "id": "dimension",
       "url": "dimension",
       "tags": ["worldgen"],
       "minVersion": "1.16",
-      "wiki": "https://minecraft.wiki/w/Custom_dimension"
+      "wiki": "https://minecraft.wiki/w/Dimension_definition"
     },
     {
       "id": "dimension_type",
@@ -377,14 +428,14 @@
       "url": "worldgen/biome",
       "tags": ["worldgen"],
       "minVersion": "1.16",
-      "wiki": "https://minecraft.wiki/w/Custom_biome"
+      "wiki": "https://minecraft.wiki/w/Biome_definition"
     },
     {
       "id": "worldgen/configured_carver",
       "url": "worldgen/carver",
       "tags": ["worldgen"],
       "minVersion": "1.16",
-      "wiki": "https://minecraft.wiki/w/Custom_carver"
+      "wiki": "https://minecraft.wiki/w/Carver_definition"
     },
     {
       "id": "worldgen/configured_feature",
@@ -419,7 +470,7 @@
       "url": "worldgen/noise-settings",
       "tags": ["worldgen"],
       "minVersion": "1.16",
-      "wiki": "https://minecraft.wiki/w/Custom_noise_settings"
+      "wiki": "https://minecraft.wiki/w/Noise_settings"
     },
     {
       "id": "worldgen/configured_structure_feature",
@@ -433,7 +484,7 @@
       "url": "worldgen/structure",
       "tags": ["worldgen"],
       "minVersion": "1.19",
-      "wiki": "https://minecraft.wiki/w/Custom_structure"
+      "wiki": "https://minecraft.wiki/w/Structure_definition"
     },
     {
       "id": "worldgen/structure_set",
@@ -469,14 +520,14 @@
       "url": "worldgen/world-preset",
       "tags": ["worldgen"],
       "minVersion": "1.19",
-      "wiki": "https://minecraft.wiki/w/Custom_world_preset"
+      "wiki": "https://minecraft.wiki/w/World_preset_definition"
     },
     {
       "id": "worldgen/flat_level_generator_preset",
       "url": "worldgen/flat-world-preset",
       "tags": ["worldgen"],
       "minVersion": "1.19",
-      "wiki": "https://minecraft.wiki/w/Custom_world_preset#Superflat_Level_Generation_Preset"
+      "wiki": "https://minecraft.wiki/w/World_preset_definition#Superflat_Level_Generation_Preset"
     },
     {
       "id": "world",
@@ -492,21 +543,21 @@
       "url": "tags/block",
       "tags": ["tags"],
       "path": "tags/block",
-      "wiki": "https://minecraft.wiki/w/Tag#Java_Edition"
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
     },
     {
       "id": "tag/entity_type",
       "url": "tags/entity-type",
       "tags": ["tags"],
       "path": "tags/entity_type",
-      "wiki": "https://minecraft.wiki/w/Tag#Java_Edition"
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
     },
     {
       "id": "tag/fluid",
       "url": "tags/fluid",
       "tags": ["tags"],
       "path": "tags/fluid",
-      "wiki": "https://minecraft.wiki/w/Tag#Java_Edition"
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
     },
     {
       "id": "tag/game_event",
@@ -514,14 +565,14 @@
       "tags": ["tags"],
       "path": "tags/game_event",
       "minVersion": "1.17",
-      "wiki": "https://minecraft.wiki/w/Tag#Java_Edition"
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
     },
     {
       "id": "tag/item",
       "url": "tags/item",
       "tags": ["tags"],
       "path": "tags/item",
-      "wiki": "https://minecraft.wiki/w/Tag#Java_Edition"
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
     },
     {
       "id": "tag/damage_type",
@@ -529,7 +580,7 @@
       "tags": ["tags"],
       "path": "tags/damage_type",
       "minVersion": "1.19.4",
-      "wiki": "https://minecraft.wiki/w/Tag#Java_Edition"
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
     },
     {
       "id": "tag/dialog",
@@ -537,7 +588,7 @@
       "tags": ["tags"],
       "path": "tags/dialog",
       "minVersion": "1.21.6",
-      "wiki": "https://minecraft.wiki/w/Tag#Java_Edition"
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
     },
     {
       "id": "tag/worldgen/biome",
@@ -545,7 +596,7 @@
       "tags": ["tags", "worldgen"],
       "path": "tags/worldgen/biome",
       "minVersion": "1.18.2",
-      "wiki": "https://minecraft.wiki/w/Tag#Java_Edition"
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
     },
     {
       "id": "tag/worldgen/structure",
@@ -553,7 +604,7 @@
       "tags": ["tags", "worldgen"],
       "path": "tags/worldgen/structure",
       "minVersion": "1.19",
-      "wiki": "https://minecraft.wiki/w/Tag#Java_Edition"
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
     },
     {
       "id": "tag/worldgen/structure_set",
@@ -561,7 +612,7 @@
       "tags": ["tags", "worldgen"],
       "path": "tags/worldgen/structure_set",
       "minVersion": "1.18.2",
-      "wiki": "https://minecraft.wiki/w/Tag#Java_Edition"
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
     },
     {
       "id": "tag/worldgen/flat_level_generator_preset",
@@ -569,7 +620,7 @@
       "tags": ["tags", "worldgen"],
       "path": "tags/worldgen/flat_level_generator_preset",
       "minVersion": "1.19",
-      "wiki": "https://minecraft.wiki/w/Tag#Java_Edition"
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
     },
     {
       "id": "tag/worldgen/world_preset",
@@ -577,7 +628,7 @@
       "tags": ["tags", "worldgen"],
       "path": "tags/worldgen/world_preset",
       "minVersion": "1.19",
-      "wiki": "https://minecraft.wiki/w/Tag#Java_Edition"
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
     },
     {
       "id": "tag/banner_pattern",
@@ -585,7 +636,7 @@
       "tags": ["tags"],
       "path": "tags/banner_pattern",
       "minVersion": "1.19",
-      "wiki": "https://minecraft.wiki/w/Tag#Java_Edition"
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
     },
     {
       "id": "tag/cat_variant",
@@ -593,7 +644,7 @@
       "tags": ["tags"],
       "path": "tags/cat_variant",
       "minVersion": "1.19",
-      "wiki": "https://minecraft.wiki/w/Tag#Java_Edition"
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
     },
     {
       "id": "tag/enchantment",
@@ -601,7 +652,7 @@
       "tags": ["tags"],
       "path": "tags/enchantment",
       "minVersion": "1.19",
-      "wiki": "https://minecraft.wiki/w/Tag#Java_Edition"
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
     },
     {
       "id": "tag/instrument",
@@ -609,7 +660,7 @@
       "tags": ["tags"],
       "path": "tags/instrument",
       "minVersion": "1.19",
-      "wiki": "https://minecraft.wiki/w/Tag#Java_Edition"
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
     },
     {
       "id": "tag/painting_variant",
@@ -617,7 +668,7 @@
       "tags": ["tags"],
       "path": "tags/painting_variant",
       "minVersion": "1.19",
-      "wiki": "https://minecraft.wiki/w/Tag#Java_Edition"
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
     },
     {
       "id": "tag/point_of_interest_type",
@@ -625,7 +676,39 @@
       "tags": ["tags"],
       "path": "tags/point_of_interest_type",
       "minVersion": "1.19",
-      "wiki": "https://minecraft.wiki/w/Tag#Java_Edition"
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
+    },
+    {
+      "id": "tag/timeline",
+      "url": "tags/timeline",
+      "tags": ["tags"],
+      "path": "tags/timeline",
+      "minVersion": "1.21.11",
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
+    },
+    {
+      "id": "tag/zombie_nautilus_variant",
+      "url": "tags/zombie-nautilus-variant",
+      "tags": ["tags"],
+      "path": "tags/zombie_nautilus_variant",
+      "minVersion": "1.21.11",
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
+    },
+    {
+      "id": "tag/villager_trade",
+      "url": "tags/villager-trade",
+      "tags": ["tags"],
+      "path": "tags/villager_trade",
+      "minVersion": "26.1",
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
+    },
+    {
+      "id": "tag/trade_set",
+      "url": "tags/trade-set",
+      "tags": ["tags"],
+      "path": "tags/trade_set",
+      "minVersion": "26.1",
+      "wiki": "https://minecraft.wiki/w/Tag_(Java_Edition)"
     },
     {
       "id": "block_definition",
@@ -664,7 +747,7 @@
       "path": "equipment",
       "tags": ["assets"],
       "minVersion": "1.21.4",
-      "wiki": "https://minecraft.wiki/w/Model#Equipment_models"
+      "wiki": "https://minecraft.wiki/w/Equipment"
     },
     {
       "id": "lang",
@@ -679,7 +762,7 @@
       "path": "font",
       "tags": ["assets"],
       "minVersion": "1.16",
-      "wiki": "https://minecraft.wiki/w/Resource_pack#Fonts"
+      "wiki": "https://minecraft.wiki/w/Font#Providers"
     },
     {
       "id": "atlas",
@@ -687,7 +770,7 @@
       "path": "atlases",
       "tags": ["assets"],
       "minVersion": "1.19.3",
-      "wiki": "https://minecraft.wiki/w/Resource_pack#Atlases"
+      "wiki": "https://minecraft.wiki/w/Atlas"
     },
     {
       "id": "post_effect",
@@ -696,6 +779,22 @@
       "tags": ["assets"],
       "minVersion": "1.21.2",
       "wiki": "https://minecraft.wiki/w/Shader#Post-processing_effects"
+    },
+    {
+      "id": "sounds",
+      "url": "assets/sounds",
+      "tags": ["assets"],
+      "wiki": "https://minecraft.wiki/w/Sounds.json"
+    },
+    {
+      "id": "ad_astra:planets",
+      "url": "ad-astra/planets",
+      "path": "planets",
+      "tags": ["partners"],
+      "dependency": "ad_astra",
+      "minVersion": "1.20",
+      "maxVersion": "1.20.3",
+      "wiki": "https://ad-astra.terrarium.wiki/datapack.html"
     },
     {
       "id": "fabric:fabric_mod_json",
@@ -729,6 +828,15 @@
       "dependency": "neoforge",
       "minVersion": "1.20.2",
       "wiki": "https://docs.neoforged.net/docs/worldgen/biomemodifier"
+    },
+    {
+      "id": "neoforge:data_map_acceptable_villager_distances",
+      "url": "neoforge/data-map-acceptable-villager-distances",
+      "path": "neoforge/data_map_acceptable_villager_distances",
+      "tags": ["partners"],
+      "dependency": "neoforge",
+      "minVersion": "1.21.7",
+      "wiki": "https://docs.neoforged.net/docs/resources/server/datamaps/builtin/#neoforgeacceptable_villager_distances"
     },
     {
       "id": "neoforge:data_map_compostables",
@@ -785,6 +893,15 @@
       "wiki": "https://docs.neoforged.net/docs/resources/server/datamaps/builtin#neoforgeraid_hero_gifts"
     },
     {
+      "id": "neoforge:data_map_strippables",
+      "url": "neoforge/data-map-strippables",
+      "path": "neoforge/data_map_strippables",
+      "tags": ["partners"],
+      "dependency": "neoforge",
+      "minVersion": "1.21.8",
+      "wiki": "https://docs.neoforged.net/docs/resources/server/datamaps/builtin#neoforgestrippables"
+    },
+    {
       "id": "neoforge:data_map_vibration_frequencies",
       "url": "neoforge/data-map-vibration-frequencies",
       "path": "neoforge/data_map_vibration_frequencies",
@@ -792,6 +909,15 @@
       "dependency": "neoforge",
       "minVersion": "1.20.4",
       "wiki": "https://docs.neoforged.net/docs/resources/server/datamaps/builtin#neoforgevibration_frequencies"
+    },
+    {
+      "id": "neoforge:data_map_villager_types",
+      "url": "neoforge/data-map-villager-types",
+      "path": "neoforge/data_map_villager_types",
+      "tags": ["partners"],
+      "dependency": "neoforge",
+      "minVersion": "1.21.4",
+      "wiki": "https://docs.neoforged.net/docs/resources/server/datamaps/builtin#neoforgevillager_types"
     },
     {
       "id": "neoforge:data_map_waxables",
@@ -835,6 +961,13 @@
       "path": "create",
       "tags": ["partners"],
       "dependency": "create"
+    },
+    {
+      "id": "loot-table-modifier:loot_modifier",
+      "url": "loot-table-modifier/loot_modifier",
+      "path": "loot-table-modifier/loot_modifier",
+      "tags": ["partners"],
+      "dependency": "loot-table-modifier"
     },
     {
       "id": "thermoo:environment_provider",
@@ -948,6 +1081,33 @@
       "id": "pixelmon:npc_preset",
       "url": "pixelmon/npc/preset",
       "path": "pixelmon/npc/preset",
+      "tags": ["partners"],
+      "dependency": "pixelmon",
+      "wiki": "https://pixelmonmod.com/wiki/",
+      "minVersion": "1.21.1"
+    },
+    {
+      "id": "pixelmon:pokedex_trigger",
+      "url": "pixelmon/pokemon/pokedex/trigger",
+      "path": "pixelmon/pokemon/pokedex/trigger",
+      "tags": ["partners"],
+      "dependency": "pixelmon",
+      "wiki": "https://pixelmonmod.com/wiki/",
+      "minVersion": "1.21.1"
+    },
+    {
+      "id": "pixelmon:pokedex_region",
+      "url": "pixelmon/pokemon/pokedex/region",
+      "path": "pixelmon/pokemon/pokedex/region",
+      "tags": ["partners"],
+      "dependency": "pixelmon",
+      "wiki": "https://pixelmonmod.com/wiki/",
+      "minVersion": "1.21.1"
+    },
+    {
+      "id": "pixelmon:pokedex",
+      "url": "pixelmon/pokemon/pokedex/pokedex",
+      "path": "pixelmon/pokemon/pokedex/pokedex",
       "tags": ["partners"],
       "dependency": "pixelmon",
       "wiki": "https://pixelmonmod.com/wiki/",
