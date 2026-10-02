@@ -4,15 +4,12 @@ on:
   push:
     branches:
       - master
-
+  workflow_dispatch:
+  
 jobs:
   build:
-    permissions:
-      pages: read
-      
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      GH_TOKEN: ${{ github.token }}
 
     runs-on: ubuntu-latest
     steps:
