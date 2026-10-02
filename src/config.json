@@ -206,16 +206,23 @@
     },
     {
       "id": "26.1",
-      "ref": "26.1.1",
+      "ref": "26.1.2",
       "name": "26.1",
       "pack_format": 101,
       "show": true
     },
     {
       "id": "26.2",
-      "dynamic": true,
+      "ref": "26.2",
       "name": "26.2",
-      "pack_format": 106,
+      "pack_format": 107,
+      "show": true
+    },
+    {
+      "id": "26.3",
+      "dynamic": true,
+      "name": "26.3",
+      "pack_format": 119,
       "show": true
     }
   ],
@@ -261,12 +268,14 @@
     {
       "id": "trim_material",
       "url": "trim-material",
-      "minVersion": "1.19.4"
+      "minVersion": "1.19.4",
+      "wiki": "https://minecraft.wiki/w/Armor_trim_definition#Trim_material"
     },
     {
       "id": "trim_pattern",
       "url": "trim-pattern",
-      "minVersion": "1.19.4"
+      "minVersion": "1.19.4",
+      "wiki": "https://minecraft.wiki/w/Armor_trim_definition#Trim_pattern"
     },
     {
       "id": "banner_pattern",
@@ -283,7 +292,8 @@
     {
       "id": "wolf_sound_variant",
       "url": "wolf-sound-variant",
-      "minVersion": "1.21.5"
+      "minVersion": "1.21.5",
+      "wiki": "https://minecraft.wiki/w/Mob_variant_definitions#Wolf_sounds"
     },
     {
       "id": "enchantment",
@@ -328,10 +338,22 @@
       "wiki": "https://minecraft.wiki/w/Mob_variant_definitions#Pig"
     },
     {
+      "id": "pig_sound_variant",
+      "url": "pig-sound-variant",
+      "minVersion": "26.1",
+      "wiki": "https://minecraft.wiki/w/Mob_variant_definitions#Pig_sounds"
+    },
+    {
       "id": "cat_variant",
       "url": "cat-variant",
       "minVersion": "1.21.5",
       "wiki": "https://minecraft.wiki/w/Mob_variant_definitions#Cat"
+    },
+    {
+      "id": "cat_sound_variant",
+      "url": "cat-sound-variant",
+      "minVersion": "26.1",
+      "wiki": "https://minecraft.wiki/w/Mob_variant_definitions#Cat_sounds"
     },
     {
       "id": "frog_variant",
@@ -346,10 +368,34 @@
       "wiki": "https://minecraft.wiki/w/Mob_variant_definitions#Chicken"
     },
     {
+      "id": "chicken_sound_variant",
+      "url": "chicken-sound-variant",
+      "minVersion": "26.1",
+      "wiki": "https://minecraft.wiki/w/Mob_variant_definitions#Chicken_sounds"
+    },
+    {
+      "id": "context_float_provider",
+      "url": "context-float-provider",
+      "aliases": ["number", "number provider"],
+      "minVersion": "26.3"
+    },
+    {
+      "id": "context_int_provider",
+      "url": "context-int-provider",
+      "aliases": ["number", "number provider"],
+      "minVersion": "26.3"
+    },
+    {
       "id": "cow_variant",
       "url": "cow-variant",
       "minVersion": "1.21.5",
       "wiki": "https://minecraft.wiki/w/Mob_variant_definitions#Cow"
+    },
+    {
+      "id": "cow_sound_variant",
+      "url": "cow-sound-variant",
+      "minVersion": "26.1",
+      "wiki": "https://minecraft.wiki/w/Mob_variant_definitions#Cow_sounds"
     },
     {
       "id": "dialog",
@@ -378,7 +424,14 @@
     {
       "id": "zombie_nautilus_variant",
       "url": "zombie-nautilus-variant",
-      "minVersion": "1.21.11"
+      "minVersion": "1.21.11",
+      "wiki": "https://minecraft.wiki/w/Mob_variant_definitions#Zombie_Nautilus"
+    },
+    {
+      "id": "world_clock",
+      "url": "world-clock",
+      "minVersion": "26.1",
+      "wiki": "https://minecraft.wiki/w/World_clock"
     },
     {
       "id": "villager_trade",
@@ -397,6 +450,23 @@
       "url": "sulfur-cube-archetype",
       "minVersion": "26.2",
       "wiki": "https://minecraft.wiki/w/Sulfur_cube_archetype_definition"
+    },
+    {
+      "id": "slot_source",
+      "url": "slot-source",
+      "minVersion": "26.3",
+      "wiki": "https://minecraft.wiki/w/Slot_source"
+    },
+    {
+      "id": "decorated_pot_pattern",
+      "url": "decorated-pot-pattern",
+      "minVersion": "26.3",
+      "wiki": "https://minecraft.wiki/w/Decorated_pot_pattern_definition"
+    },
+    {
+      "id": "block_transformer",
+      "url": "block-transformer",
+      "minVersion": "26.3"
     },
     {
       "id": "text_component",
@@ -432,16 +502,32 @@
     },
     {
       "id": "worldgen/configured_carver",
-      "url": "worldgen/carver",
+      "url": "worldgen/configured-carver",
       "tags": ["worldgen"],
       "minVersion": "1.16",
+      "maxVersion": "26.2",
+      "wiki": "https://minecraft.wiki/w/Carver_definition"
+    },
+    {
+      "id": "worldgen/carver",
+      "url": "worldgen/carver",
+      "tags": ["worldgen"],
+      "minVersion": "26.3",
       "wiki": "https://minecraft.wiki/w/Carver_definition"
     },
     {
       "id": "worldgen/configured_feature",
-      "url": "worldgen/feature",
+      "url": "worldgen/configured-feature",
       "tags": ["worldgen"],
       "minVersion": "1.16",
+      "maxVersion": "26.2",
+      "wiki": "https://minecraft.wiki/w/Configured_feature"
+    },
+    {
+      "id": "worldgen/feature",
+      "url": "worldgen/feature",
+      "tags": ["worldgen"],
+      "minVersion": "26.3",
       "wiki": "https://minecraft.wiki/w/Configured_feature"
     },
     {
@@ -457,6 +543,18 @@
       "tags": ["worldgen"],
       "minVersion": "1.18.2",
       "wiki": "https://minecraft.wiki/w/Density_function"
+    },
+    {
+      "id": "worldgen/material_condition",
+      "url": "worldgen/material-condition",
+      "tags": ["worldgen"],
+      "minVersion": "26.3"
+    },
+    {
+      "id": "worldgen/material_rule",
+      "url": "worldgen/material-rule",
+      "tags": ["worldgen"],
+      "minVersion": "26.3"
     },
     {
       "id": "worldgen/noise",
@@ -1112,6 +1210,33 @@
       "dependency": "pixelmon",
       "wiki": "https://pixelmonmod.com/wiki/",
       "minVersion": "1.21.1"
+    },
+    {
+      "id": "lychee:recipe",
+      "url": "lychee/recipe",
+      "path": "lychee",
+      "tags": ["partners"],
+      "dependency": "lychee",
+      "wiki": "https://lycheetweaker.readthedocs.io/",
+      "minVersion": "1.20"
+    },
+    {
+      "id": "starexpress:guidebook_entry",
+      "url": "starexpress/guidebook-entry",
+      "path": "guidebook_entries",
+      "tags": ["partners"],
+      "dependency": "starexpress",
+      "wiki": "https://github.com/AussieBox/StarryExpress/wiki/The-Guidebook",
+      "minVersion": "1.21.1"
+    },
+    {
+      "id": "treeplacer:sapling_overrides",
+      "url": "treeplacer/sapling_overrides",
+      "path": "sapling_overrides/minecraft",
+      "tags": ["partners"],
+      "dependency": "treeplacer",
+      "minVersion": "1.20.1",
+      "wiki": "https://github.com/OutrightWings/treeplacer_mod/wiki"
     },
     {
       "id": "flan:permission_legacy",
