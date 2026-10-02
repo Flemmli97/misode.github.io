@@ -7,6 +7,10 @@ on:
 
 jobs:
   build:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -21,11 +25,8 @@ jobs:
         npm install
         export latest_version="'${{ steps.version.outputs.id }}'"
 
-        repository=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 2)
-        if [[ "$repository" != "$GITHUB_REPOSITORY_OWNER.github.io" ]]; then
-            export sub_directory="/${repository}"
-            echo "Deploying to $sub_directory"
-        fi
+        url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
+        export sub_directory=$(python -c "from urllib.parse import urlparse; print(urlparse('$url').path.rstrip('/'))")
 
         npm run build
 
