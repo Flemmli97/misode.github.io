@@ -26,8 +26,9 @@ jobs:
         export latest_version="'${{ steps.version.outputs.id }}'"
 
         url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
-        export sub_directory=$(python -c "from urllib.parse import urlparse; print(urlparse('$url').path.rstrip('/'))")
+        sub_directory=$(python -c "from urllib.parse import urlparse; print(urlparse('$url').path.rstrip('/'))")
         if [ -n "$sub_directory" ]; then
+          export sub_directory
           echo "Deploying to $sub_directory"
         fi
 
