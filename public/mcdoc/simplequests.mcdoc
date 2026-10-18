@@ -129,6 +129,8 @@ enum(string) QuestEntryTypes {
 	#[name="Taming (Runecraftory)"] Taming = "runecraftory:taming",
 }
 
+type QuestHolder = (QuestBase | #[id="simplequests:quest"] string)
+
 // Quest types
 dispatch simplequests:quests[simplequests_api:quest] to struct Quest {
 	loot_table?: #[id="loot_table"] string,
@@ -138,13 +140,13 @@ dispatch simplequests:quests[simplequests_api:quest] to struct Quest {
 }
 dispatch simplequests:quests[simplequests_api:composite_quest] to struct CompositeQuest {
 	// API 3.0.0+ or mod 2.3.0+ only supports quests otherwise needs id 
-	quests: [(QuestBase | #[id] string)] @ 1..,
+	quests: [QuestHolder] @ 1..,
 }
 dispatch simplequests:quests[simplequests_api:sequential_quest] to struct SequentialQuest {
 	loot_table: #[id="loot_table"] string,
 	command?: string,
 	// API 3.0.0+ or mod 2.3.0+ only supports quests otherwise needs id 
-	quests: [(QuestBase | #[id] string)] @ 1..,
+	quests: [QuestHolder] @ 1..,
 }
 
 struct QuestBase {
@@ -180,25 +182,44 @@ enum(string) QuestTypes {
 // Runecraftory
 
 dispatch simplequests:quests[runecraftory:npc_quest] to struct {
-	target_npc_ids: [#[id="runecraftory:npc_data"] string],
-	quests: [#[id="simplequests:quest"] string],
+	quest_givers: [#[id="runecraftory:npc_data"] string],
+	quests: [struct {
+		quest: QuestHolder,
+		dialogues: struct {
+			start_id?: #[id="runecraftory:conversation"] string,
+			active_id?: #[id="runecraftory:conversation"] string,
+			end_id?: #[id="runecraftory:conversation"] string,
+		}
+	}],
 	loot_table: #[id="loot_table"] string,
-	global: boolean,
+	global?: boolean,
+	conditions?: [struct {
+		condition: #[id="loot_condition_type"] #[dispatcher_key="runecraftory:loot_condition_type"] string,
+		...minecraft:loot_condition[[condition]],
+		...runecraftory:loot_condition[[condition]],
+	}],
 }
 
+dispatch simplequests:entry[runecraftory:delivery] to struct {
+	target_npc_id?: #[id="runecraftory:npc_data"] string,
+	dialogue?: #[id="runecraftory:conversation"] string,
+	items: [DescriptiveValue<ItemPredicate>],
+	amount: NumberProvider,
+}
 dispatch simplequests:entry[runecraftory:level] to struct {
 	level: NumberProvider,
 	description: string,
 }
 dispatch simplequests:entry[runecraftory:npc_talk] to struct {
 	/// Not implemented
-	// target_npc_id?: string,
+	target_npc_id?: #[id="runecraftory:npc_data"] string,
+	dialogue?: #[id="runecraftory:conversation"] string,
 	predicate?: EntityPredicate
 }
 dispatch simplequests:entry[runecraftory:shipping] to struct {
 	item_predicates: [DescriptiveValue<ItemPredicate>],
 	amount: NumberProvider,
-	description?: string,
+	description: string,
 }
 type Skills = (
 	"SHORTSWORD" |
@@ -240,9 +261,10 @@ type Skills = (
 dispatch simplequests:entry[runecraftory:skill_level] to struct {
 	skill: [Skills],
 	level: NumberProvider,
+	description: string,
 }
 dispatch simplequests:entry[runecraftory:taming] to struct {
 	predicates: [DescriptiveValue<EntityPredicate>],
 	amount: NumberProvider,
-	description?: string,
+	description: string,
 }
