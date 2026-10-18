@@ -131,18 +131,20 @@ enum(string) QuestEntryTypes {
 
 // Quest types
 dispatch simplequests:quests[simplequests_api:quest] to struct Quest {
-	loot_table: #[id="loot_table"] string,
+	loot_table?: #[id="loot_table"] string,
 	command?: string,
 	submission_trigger?: string,
 	tasks: QuestTasksMap,
 }
 dispatch simplequests:quests[simplequests_api:composite_quest] to struct CompositeQuest {
-	quests: [#[id] string] @ 1..,
+	// API 3.0.0+ or mod 2.3.0+ only supports quests otherwise needs id 
+	quests: [(QuestBase | #[id] string)] @ 1..,
 }
 dispatch simplequests:quests[simplequests_api:sequential_quest] to struct SequentialQuest {
 	loot_table: #[id="loot_table"] string,
 	command?: string,
-	quests: [#[id] string] @ 1..,
+	// API 3.0.0+ or mod 2.3.0+ only supports quests otherwise needs id 
+	quests: [(QuestBase | #[id] string)] @ 1..,
 }
 
 struct QuestBase {
@@ -173,7 +175,6 @@ enum(string) QuestTypes {
 	SequentialQuest = "simplequests_api:sequential_quest",
 	CompositeQuest = "simplequests_api:composite_quest",
 	#[name="NPCQuest (Runecraftory)"] NPCQuest = "runecraftory:npc_quest",
-	// #[name="QuestBoardQuest (Runecraftory)"] NPCQuest = "runecraftory:quest_board_quest",
 }
 
 // Runecraftory
