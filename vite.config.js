@@ -9,7 +9,6 @@ const English = require('./src/locales/en.json')
 const convertFormats = ['give-command', 'loot-table', 'item-modifier', 'recipe-output']
 
 export default defineConfig({
-	base: env.sub_directory,
 	server: {
 		port: 3000,
 	},
@@ -64,7 +63,6 @@ export default defineConfig({
 	},
 	define: {
 		__LATEST_VERSION__: env.latest_version,
-		__BASE_DIRECTORY__: env.sub_directory ? `'${env.sub_directory}'` : undefined
 	},
 	plugins: [
 		preact(),

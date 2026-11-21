@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
-import { assetPath } from '../../App.jsx'
 import { useLocale, useVersion } from '../../contexts/index.js'
 import { useAsync } from '../../hooks/useAsync.js'
 import { checkVersion, fetchAllPresets } from '../../services/index.js'
@@ -44,13 +43,13 @@ export const RecipePreview = ({ docAndNode }: PreviewProps) => {
 	const gui = useMemo(() => {
 		const type = recipe?.type?.replace(/^minecraft:/, '')
 		if (type === 'smelting' || type === 'blasting' || type === 'smoking' || type === 'campfire_cooking') {
-			return assetPath('/images/furnace.png')
+			return '/images/furnace.png'
 		} else if (type === 'stonecutting') {
-			return assetPath('/images/stonecutter.png')
+			return '/images/stonecutter.png'
 		} else if (type === 'smithing_transform' || type === 'smithing_trim') {
-			return assetPath('/images/smithing.png')
+			return '/images/smithing.png'
 		} else {
-			return assetPath('/images/crafting_table.png')
+			return '/images/crafting_table.png'
 		}
 	}, [text])
 

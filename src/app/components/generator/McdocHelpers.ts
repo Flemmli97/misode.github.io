@@ -324,7 +324,7 @@ export function namedAttribute(attributes?: Attributes): LiteralType | undefined
 	return attributes?.find(isNameAtt)?.value
 }
 
-export function getCategory(type: McdocType) {
+export function getCategory(type: McdocType): string | undefined {
 	if (type.kind === 'reference' && type.path) {
 		switch (type.path) {
 			case '::java::data::loot::LootPool':

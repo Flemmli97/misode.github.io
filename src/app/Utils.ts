@@ -3,8 +3,8 @@ import type { Identifier, NbtTag, Random } from 'deepslate'
 import { Matrix3, Matrix4, NbtByte, NbtCompound, NbtDouble, NbtInt, NbtList, NbtString, Vector } from 'deepslate'
 import type { mat3 } from 'gl-matrix'
 import { quat, vec2 } from 'gl-matrix'
+import { route } from 'preact-router'
 import rfdc from 'rfdc'
-import { appRoute, BASE_URL } from './App.jsx'
 import type { ConfigGenerator } from './Config.js'
 import config from './Config.js'
 import type { VersionId } from './services/index.js'
@@ -99,7 +99,7 @@ export function getPath(url: string) {
 }
 
 export function getGenerator(url: string) {
-	const trimmedUrl = getPath(url).replace(BASE_URL, "").replace(/^\//, '').replace(/\/$/, '')
+	const trimmedUrl = getPath(url).replace(/^\//, '').replace(/\/$/, '')
 	return config.generators.find(g => g.url === trimmedUrl)
 }
 
@@ -107,7 +107,7 @@ export function changeUrl({ path, search, hash, replace }: { path?: string, sear
 	const url = (path !== undefined ? cleanUrl(path) : location.pathname)
 		+ (search !== undefined ? (search.startsWith('?') || search.length === 0 ? search : '?' + search) : location.search)
 		+ (hash !== undefined ? (hash.startsWith('#') ? hash : '#' + hash) : location.hash)
-	appRoute(url, replace)
+	route(url, replace)
 }
 
 export type Color = [number, number, number]

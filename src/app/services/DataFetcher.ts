@@ -1,4 +1,3 @@
-import { assetPath } from '../App.jsx'
 import config from '../Config.js'
 import { Store } from '../Store.js'
 import { message } from '../Utils.js'
@@ -67,7 +66,7 @@ export async function fetchVanillaMcdoc(): Promise<VanillaMcdocSymbols> {
 
 export async function fetchDependencyMcdoc(dependency: string) {
 	try {
-		return await cachedFetch(assetPath(`/mcdoc/${dependency}.mcdoc`), { decode: res => res.text(), refresh: true })
+		return await cachedFetch(`/mcdoc/${dependency}.mcdoc`, { decode: res => res.text(), refresh: true })
 	} catch (e) {
 		throw new Error(`Error occured while fetching ${dependency} mcdoc: ${message(e)}`)
 	}
@@ -90,7 +89,7 @@ export async function fetchRegistries(versionId: VersionId) {
 	await validateCache(version)
 	async function handleOverride(currentValue: any) {
 		try {
-			const addition = await cachedFetch(assetPath(`/registries.json`), { decode: res => res.json(), refresh: true })
+			const addition = await cachedFetch(`/registries.json`, { decode: res => res.json(), refresh: true })
 			return merge(currentValue, addition)
 		} catch (e) {
 			console.error(`Failed additional loading registry entries in file “/registries.json”`, e)
