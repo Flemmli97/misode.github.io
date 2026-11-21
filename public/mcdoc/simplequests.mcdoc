@@ -30,13 +30,12 @@ type DescriptiveValue<C> = struct {
 type NumberProvider = (
 	float |
 	struct {
-		type?: (#[id="loot_number_provider_type"] #[dispatcher_key="simplequests:number_provider"] string),
+		type?: #[id="loot_number_provider_type"] string,
 		...minecraft:number_provider[[type]],
-		...simplequests:number_provider[[type]],
 	}
 )
 
-dispatch simplequests:number_provider[simplequests_api:context_multiplier] to struct QuestContextMultiplier {
+dispatch minecraft:number_provider[simplequests_api:context_multiplier] to struct QuestContextMultiplier {
 	value: NumberProvider,
 	multiplier: float,
 	max?: float
