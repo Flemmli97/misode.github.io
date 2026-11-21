@@ -316,21 +316,7 @@ export function namedAttribute(attributes?: Attributes): LiteralType | undefined
 	return attributes?.find(isNameAtt)?.value
 }
 
-export function nameFromAttribute(attributes?: Attributes): string | undefined {
-	return namedAttribute(attributes)?.value.value.toString()
-}
-
-export function namedAttribute(attributes?: Attributes): LiteralType | undefined {
-	function isNameAtt(att: Attribute): att is {
-		name: string;
-		value?: LiteralType | undefined;
-	} {
-		return att.name === "name" && att.value?.kind === "literal";
-	}
-	return attributes?.find(isNameAtt)?.value
-}
-
-export function getCategory(type: McdocType): string | undefined {
+export function getCategory(type: McdocType) {
 	if (type.kind === 'reference' && type.path) {
 		switch (type.path) {
 			case '::java::data::loot::LootPool':
