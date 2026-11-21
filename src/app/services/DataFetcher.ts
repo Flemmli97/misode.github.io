@@ -14,6 +14,7 @@ export const latestVersion = __LATEST_VERSION__ ?? ''
 const mcmetaUrl = 'https://raw.githubusercontent.com/misode/mcmeta'
 const mcmetaTarballUrl = 'https://github.com/misode/mcmeta/tarball'
 const vanillaMcdocUrl = 'https://raw.githubusercontent.com/SpyglassMC/vanilla-mcdoc'
+const spyglassApiUrl = 'https://api.spyglassmc.com/mcje'
 const changesUrl = 'https://raw.githubusercontent.com/misode/technical-changes'
 const versionDiffUrl = 'https://mcmeta-diff.misode.workers.dev'
 const whatsNewUrl = 'https://whats-new.misode.workers.dev'
@@ -55,7 +56,10 @@ export interface VanillaMcdocSymbols {
 }
 export async function fetchVanillaMcdoc(): Promise<VanillaMcdocSymbols> {
 	try {
-		return cachedFetch<VanillaMcdocSymbols>(`${vanillaMcdocUrl}/generated/symbols.json`, { refresh: true })
+		return await cachedFetchBackup<VanillaMcdocSymbols>([
+			`${vanillaMcdocUrl}/generated/symbols.json`,
+			`${spyglassApiUrl}/vanilla-mcdoc/symbols`,
+		], { refresh: true })
 	} catch (e) {
 		throw new Error(`Error occured while fetching vanilla-mcdoc: ${message(e)}`)
 	}
@@ -63,7 +67,7 @@ export async function fetchVanillaMcdoc(): Promise<VanillaMcdocSymbols> {
 
 export async function fetchDependencyMcdoc(dependency: string) {
 	try {
-		return cachedFetch(assetPath(`/mcdoc/${dependency}.mcdoc`), { decode: res => res.text(), refresh: true })
+		return await cachedFetch(assetPath(`/mcdoc/${dependency}.mcdoc`), { decode: res => res.text(), refresh: true })
 	} catch (e) {
 		throw new Error(`Error occured while fetching ${dependency} mcdoc: ${message(e)}`)
 	}
@@ -74,7 +78,10 @@ export async function fetchRegistries(versionId: VersionId) {
 	const version = config.versions.find(v => v.id === versionId)!
 	await validateCache(version)
 	try {
-		const data = await cachedFetch<any>(`${mcmeta(version, 'summary')}/registries/data.min.json`)
+		const data = await cachedFetchBackup<any>([
+			`${mcmeta(version, 'summary')}/registries/data.min.json`,
+			`${spyglassApiUrl}/versions/${version.ref}/registries`,
+		])
 		const result = new Map<string, string[]>()
 		for (const id in data) {
 			result.set(id, data[id].map((e: string) => 'minecraft:' + e))
@@ -93,7 +100,10 @@ export async function fetchBlockStates(versionId: VersionId) {
 	const result = new Map<string, BlockStateData>()
 	await validateCache(version)
 	try {
-		const data = await cachedFetch<any>(`${mcmeta(version, 'summary')}/blocks/data.min.json`)
+		const data = await cachedFetchBackup<any>([
+			`${mcmeta(version, 'summary')}/blocks/data.min.json`,
+			`${spyglassApiUrl}/versions/${version.ref}/block_states`,
+		])
 		for (const id in data) {
 			result.set(id, data[id])
 		}
@@ -203,7 +213,10 @@ export type VersionMeta = {
 export async function fetchVersions(): Promise<VersionMeta[]> {
 	await validateCache({ dynamic: true })
 	try {
-		return cachedFetch(`${mcmeta({ dynamic: true }, 'summary')}/versions/data.min.json`, { refresh: true })
+		return await cachedFetchBackup([
+			`${mcmeta({ dynamic: true }, 'summary')}/versions/data.min.json`,
+			`${spyglassApiUrl}/versions`,
+		], { refresh: true })
 	} catch (e) {
 		throw new Error(`Error occured while fetching versions: ${message(e)}`)
 	}
@@ -440,6 +453,18 @@ async function fetchAndCache<D>(cache: Cache, url: string, decode: (r: Response)
 	const fetchData = await decode(fetchResponse)
 	await cache.put(url, fetchClone)
 	return fetchData
+}
+
+async function cachedFetchBackup<D = unknown>(urls: string[], options: FetchOptions<D> = {}): Promise<D> {
+	let error: unknown = Error('No URLs to fetch')
+	for (const url of urls) {
+		try {
+			return await cachedFetch(url, options)
+		} catch (e) {
+			error = e
+		}
+	}
+	throw error
 }
 
 async function deleteMatching(matches: (url: string) => boolean) {

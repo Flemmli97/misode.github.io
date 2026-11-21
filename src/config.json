@@ -31,6 +31,11 @@
       "mc": "fr_fr"
     },
     {
+      "code": "id",
+      "name": "Bahasa Indonesia",
+      "mc": "id_id"
+    },
+    {
       "code": "it",
       "name": "Italiano",
       "mc": "it_it"
@@ -220,9 +225,16 @@
     },
     {
       "id": "26.3",
-      "dynamic": true,
+      "ref": "26.3",
       "name": "26.3",
-      "pack_format": 119,
+      "pack_format": 121,
+      "show": true
+    },
+    {
+      "id": "26.4",
+      "dynamic": true,
+      "name": "26.4",
+      "pack_format": 125,
       "show": true
     }
   ],
@@ -469,6 +481,11 @@
       "minVersion": "26.3"
     },
     {
+      "id": "block_sound_set",
+      "url": "block-sound-set",
+      "minVersion": "26.4"
+    },
+    {
       "id": "text_component",
       "url": "text-component",
       "noPath": true,
@@ -548,12 +565,14 @@
       "id": "worldgen/material_condition",
       "url": "worldgen/material-condition",
       "tags": ["worldgen"],
+      "aliases": ["surface condition"],
       "minVersion": "26.3"
     },
     {
       "id": "worldgen/material_rule",
       "url": "worldgen/material-rule",
       "tags": ["worldgen"],
+      "aliases": ["surface rule"],
       "minVersion": "26.3"
     },
     {
@@ -1237,6 +1256,31 @@
       "dependency": "treeplacer",
       "minVersion": "1.20.1",
       "wiki": "https://github.com/OutrightWings/treeplacer_mod/wiki"
+    },
+    {
+      "id": "jsg_core:recipes",
+      "url": "jsg_core/recipes",
+      "path": "jsg_core/recipes",
+      "tags": ["partners"],
+      "minVersion": "1.20.1",
+      "dependency": "tauridev",
+      "wiki": "https://docs.tauridev.eu/jsg-core/"
+    },
+    {
+      "id": "jsg:rig_waves",
+      "url": "jsg/rig_waves",
+      "path": "jsg/rig_waves",
+      "tags": ["partners"],
+      "minVersion": "1.20.1",
+      "dependency": "tauridev",
+      "wiki": "https://docs.tauridev.eu/jsg/"
+    },
+    {
+      "id": "ars_nouveau:recipes",
+      "url": "ars_nouveau/recipes",
+      "path": "ars_nouveau",
+      "tags": ["partners"],
+      "dependency": "ars_nouveau"
     },
     {
       "id": "flan:permission_legacy",
