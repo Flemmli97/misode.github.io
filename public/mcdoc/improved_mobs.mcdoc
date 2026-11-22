@@ -43,6 +43,7 @@ enum(string) DifficultyFeatures {
 dispatch minecraft:resource[improved_mobs:entity_configs] to struct EntityConfig {
     /// Either a tag, an id, or a mod id. If using a mod id you will get a warning but you can ignore it.
 	type: EntityTypeValue, 
+    // What feature should be enabled for this mob. This will override main config settings
 	enabledFeatures?: [DifficultyFeatures],
     breakableBlocks: ConfigurableProperty<BlockHolderSet>,
     attributes: ConfigurableProperty<DifficultyAttributeProperty>,

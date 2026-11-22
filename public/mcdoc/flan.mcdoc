@@ -5,9 +5,10 @@ type BlockHolderSet = (#[id(registry="block",tags="allowed")] string | [#[id="bl
 type EntityHolderSet = (#[id(registry="entity_type",tags="allowed")] string | [#[id="entity_type"] string])
 
 struct Permission {
-    gui_item: ItemStack,
-    default_value: boolean,
-    global: boolean,
+	gui_item: ItemStack,
+	default_value: boolean,
+	/// Global means this permission does not have a player action attached to it. E.g. wither breaking blocks
+	global: boolean,
 	global_default_value: boolean,
 	require_explicit: boolean,
 	order: int,
@@ -15,15 +16,14 @@ struct Permission {
 }
 
 dispatch minecraft:resource[flan:permission] to Permission
-dispatch minecraft:resource[flan:permission_legacy] to Permission
 
 struct Override {
-    type: #[id] OverrideTypes,
-    ...flan:overrides[[type]],
+	/// What action this override is associated with
+	type: #[id] OverrideTypes,
+	...flan:overrides[[type]],
 }
 
 dispatch minecraft:resource[flan:override] to Override
-dispatch minecraft:resource[flan:override_legacy] to Override
 
 enum(string) OverrideTypes {
 	BlockLeftClick = "flan:block_left_click",
@@ -107,7 +107,6 @@ dispatch flan:builtin_permissions[
 	flan:no_hunger,
 	flan:claim_message,
 	flan:archeology,
-	flan:wind_charge,
 
 	flan:hurt_player,
 	flan:explosions,
@@ -135,6 +134,20 @@ dispatch flan:builtin_permissions[
 #[since="1.20.1"] 
 dispatch flan:builtin_permissions[
 	flan:archeology,
-	flan:player_mob_spawn,
-	flan:sculk,
+] to struct {}
+
+#[since="1.21"] 
+dispatch flan:builtin_permissions[
+	flan:wind_charge,
+] to struct {}
+
+#[since="26.2"] 
+dispatch flan:builtin_permissions[
+	flan:sulfur_cube,
+] to struct {}
+
+#[since="26.3"] 
+dispatch flan:builtin_permissions[
+	flan:cushion,
+	flan:copper_golem, // Added only since a mod version for 26.3
 ] to struct {}

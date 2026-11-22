@@ -1,11 +1,21 @@
 use ::java::data::advancement::predicate::EntityPredicate
 use ::java::data::advancement::predicate::ItemPredicate
 use ::java::world::item::ItemStack
-use ::java::data::util::NumberProvider
 
 // ===== Registry stuff =====
 
+type BlockHolderSet = (#[id(registry="block",tags="allowed")] string | [#[id="block"] string])
+type ItemHolderSet = (#[id(registry="item",tags="allowed")] string | [#[id="item"] string])
+
 type LootConditionIDS = #[id="loot_condition_type"] #[dispatcher_key="runecraftory:loot_condition_type"] string
+
+type NumberProvider = (
+	float |
+	struct {
+		type?: #[id="loot_number_provider_type"] string,
+		...minecraft:number_provider[[type]],
+	}
+)
 
 dispatch runecraftory:loot_condition[runecraftory:biome] to struct BiomeCondition {
 	biome_tag: #[id=(registry="worldgen/biome", tags="required")] string,
@@ -26,15 +36,6 @@ dispatch runecraftory:loot_condition[runecraftory:skill_check] to struct SkillCo
 dispatch runecraftory:loot_condition[runecraftory:talk_count] to struct TalkCondition {
 	count: int @ 0..,
 }
-
-dispatch runecraftory:loot_condition_type[
-	runecraftory:biome,
-	runecraftory:friend_points,
-	runecraftory:interacting_player,
-	runecraftory:season,
-	runecraftory:skill_check,
-	runecraftory:talk_count
-] to struct {}
 
 type AttributeIDS = #[id="attribute"] #[dispatcher_key="runecraftory:attributes"] string
 
@@ -263,6 +264,7 @@ dispatch runecraftory:conversation_contexts[
 	runecraftory:follow_yes,
 	runecraftory:follow_no,
 	runecraftory:follow_stop,
+	runecraftory:default_gift,
 	runecraftory:dating_accept,
 	runecraftory:dating_deny,
 	runecraftory:marriage_accept,
@@ -274,52 +276,59 @@ dispatch runecraftory:conversation_contexts[
 
 type Skills = (
 	"SHORTSWORD" |
-    "LONGSWORD" |
-    "SPEAR" |
-    "HAMMERAXE" |
-    "DUAL" |
-    "FIST" |
-    "FIRE" |
-    "WATER" |
-    "EARTH" |
-    "WIND" |
-    "DARK" |
-    "LIGHT" |
-    "LOVE" |
-    "FARMING" |
-    "LOGGING" |
-    "MINING" |
-    "FISHING" |
-    "COOKING" |
-    "FORGING" |
-    "CHEMISTRY" |
-    "CRAFTING" |
-    "SLEEPING" |
-    "SEARCHING" |
-    "WALKING" |
-    "EATING" |
-    "DEFENCE" |
-    "RES_POISON" |
-    "RES_SEAL" |
-    "RES_PARA" |
-    "RES_SLEEP" |
-    "RES_FATIGUE" |
-    "RES_COLD" |
-    "BATH" |
-    "TAMING" |
-    "LEADER"
+	"LONGSWORD" |
+	"SPEAR" |
+	"HAMMERAXE" |
+	"DUAL" |
+	"FIST" |
+	"FIRE" |
+	"WATER" |
+	"EARTH" |
+	"WIND" |
+	"DARK" |
+	"LIGHT" |
+	"LOVE" |
+	"FARMING" |
+	"LOGGING" |
+	"MINING" |
+	"FISHING" |
+	"COOKING" |
+	"FORGING" |
+	"CHEMISTRY" |
+	"CRAFTING" |
+	"SLEEPING" |
+	"SEARCHING" |
+	"WALKING" |
+	"EATING" |
+	"DEFENCE" |
+	"RES_POISON" |
+	"RES_SEAL" |
+	"RES_PARA" |
+	"RES_SLEEP" |
+	"RES_FATIGUE" |
+	"RES_COLD" |
+	"BATH" |
+	"TAMING" |
+	"LEADER"
 )
 
 // ===== Registry End =====
 
 dispatch minecraft:resource[runecraftory:crops] to struct Crops {
-	item: #[id=(registry="item", tags="allowed")] string,
+	crop: struct CropInfo {
+		seed: ItemHolderSet,
+		crop: ItemHolderSet,
+		crop_block: BlockHolderSet,
+		giant_crop?: struct GiantCropInfo {
+			item: #[id="item"] string,
+			block: #[id="block"] string,
+		}
+	},
 	growth: int @ 1..,
-	max_drops:  int @ 0..,
+	max_drops: int @ 0..,
 	regrowable: boolean,
-	giant_crop?:  #[id="block"] string,
-	best_season?:  [("SPRING" | "SUMMER" | "FALL" | "WINTER")],
-	bad_season?:  [("SPRING" | "SUMMER" | "FALL" | "WINTER")],
+	best_season?: [("SPRING" | "SUMMER" | "FALL" | "WINTER")],
+	bad_season?: [("SPRING" | "SUMMER" | "FALL" | "WINTER")],
 }
 
 dispatch minecraft:resource[runecraftory:food] to struct Food {
@@ -328,21 +337,44 @@ dispatch minecraft:resource[runecraftory:food] to struct Food {
 	effects: struct {
 		[AttributeIDS]: double,
 	},
-	effects_percentage:  struct {
+	effects_percentage: struct {
 		[AttributeIDS]: double,
 	},
-	cooking_bonus:  struct {
+	cooking_bonus: struct {
 		[AttributeIDS]: double,
 	},
-	cookingBonus_percent:  struct {
+	cookingBonus_percent: struct {
 		[AttributeIDS]: double,
 	},
-	potion_apply:  struct {
+	potion_apply: [struct {
 		item: #[id="mob_effect"] string,
 		duration: int @ 1..,
 		amplifier: int,
+	}],
+	potion_remove: [#[id="mob_effect"] string],
+}
+
+dispatch minecraft:resource[runecraftory:farmland_hoe_tile_action] to struct FarmlandTilingData {
+	item: #[id=(registry="item")] string,
+	amount: int,
+}
+
+type StructureID = (#[until="1.19"] #[id="worldgen/configured_structure_feature"] string |
+		 #[since="1.19"] #[id="worldgen/structure"] string)
+
+dispatch minecraft:resource[runecraftory:gate_spawn] to struct GateSpawning {
+	entity: #[id=(registry="entity_type")] string,
+	min_distance_from_spawn:  int @ 0..,
+	min_gate_level: int @ 0..,
+	allow_underwater: boolean,
+	biomes: struct {
+		[#[id="worldgen/biome"] string]: int @ 1..,
 	},
-	potion_remove:  [#[id="mob_effect"] string],
+	structures: struct {
+		[StructureID]: int @ 1..,
+	},
+	gate_predicate?: EntityPredicate,
+	player_predicate?: EntityPredicate,
 }
 
 dispatch minecraft:resource[runecraftory:item_property] to struct ItemStats {
@@ -350,35 +382,17 @@ dispatch minecraft:resource[runecraftory:item_property] to struct ItemStats {
 	buy_price:  int @ 0..,
 	sell_price:  int @ 0..,
 	upgrade_difficulty:  int @ 0..,
+	element: ("NONE" | "WATER" | "EARTH" | "WIND" | "FIRE" | "LIGHT" | "DARK" | "LOVE"),
 	item_stats:  struct {
 		[AttributeIDS]: double,
 	},
-	monster_bonus:  struct {
-		[AttributeIDS]: double,
-	},
-	element: ("NONE" | "WATER" | "EARTH" | "WIND" | "FIRE" | "LIGHT" | "DARK" | "LOVE"),
 	tier_1_Spell?: #[id] #[dispatcher_key="runecraftory:spells"] string,
 	tier_2_Spell?: #[id] #[dispatcher_key="runecraftory:spells"] string,
 	tier_3_Spell?: #[id] #[dispatcher_key="runecraftory:spells"] string,
 	armor_effect?:  #[id] #[dispatcher_key="runecraftory:armor_effects"] string,
-}
-
-type StructureID = (#[until="1.19"] #[id="worldgen/configured_structure_feature"] string |
-		 #[since="1.19"] #[id="worldgen/structure"] string)
-
-dispatch minecraft:resource[runecraftory:gate_spawn] to struct GateSpawning {
-	entity: #[id=(registry="entity", tags="allowed")] string,
-	min_distance_from_spawn:  int @ 0..,
-	min_gate_level:  int @ 0..,
-	allow_underwater:  boolean,
-	biomes: struct {
-		[#[id="worldgen/biome"] string]: int @ 1..,
+	monster_bonus:  struct {
+		[AttributeIDS]: double,
 	},
-	structures: struct {
-		[StructureID]: int @ 1..,
-	},
-	gate_predicate?:  EntityPredicate,
-	player_predicate?:  EntityPredicate,
 }
 
 dispatch minecraft:resource[runecraftory:shop_item] to struct ShopItems {
@@ -394,57 +408,74 @@ struct ShopItemsContent {
 
 // ===== NPC Stuff =====
 
-dispatch runecraftory:npc_actions[runecraftory:do_nothing] to struct {
-	duration: NumberProvider,
-	cooldown?: NumberProvider,
-}
-dispatch runecraftory:npc_actions[runecraftory:melee_attack] to struct {
-	walk_time:  NumberProvider,
-	cooldown?: NumberProvider,
-	speed: float,
-}
-dispatch runecraftory:npc_actions[runecraftory:spell_attack] to struct {
-	spell: #[id] #[dispatcher_key="runecraftory:spells"] string,
-	range: double @ 0..,
-	ignore_seal:  boolean,
-	walk_time:  NumberProvider,
-	cooldown?: NumberProvider,
-	combos?: NumberProvider,
-}
-dispatch runecraftory:npc_actions[runecraftory:party_target_action] to struct {
-	spell: #[id] #[dispatcher_key="runecraftory:spells"] string,
-	ignore_seal:  boolean,
-	cooldown: NumberProvider,
-}
-dispatch runecraftory:npc_actions[runecraftory:food_throw_action] to struct {
-	items: [ItemStack],
-	walk_time:  NumberProvider,
-	cooldown: NumberProvider,
-}
-dispatch runecraftory:npc_actions[runecraftory:run_away] to struct {
-	duration: NumberProvider,
-	cooldown: NumberProvider,
-	max_dist:  double,
-	speed: float,
-}
-dispatch runecraftory:npc_actions[runecraftory:walk_around] to struct {
-	duration: NumberProvider,
-	cooldown: NumberProvider,
-}
-dispatch runecraftory:npc_actions[runecraftory:run_to_leader] to struct {
-	duration: NumberProvider,
-	cooldown: NumberProvider,
+dispatch minecraft:resource[runecraftory:npc_gift] to struct GiftData {
+	items: [#[id=(registry="item", tags="allowed")] string] @ 1..,
+	xp_range?: struct {
+		min?: int,
+		max?: int,
+	},
+	translations: [string] @ 1..,
 }
 
+dispatch runecraftory:npc_actions[runecraftory:do_nothing] to struct {
+}
+dispatch runecraftory:npc_actions[runecraftory:walk_to] to struct {
+	walk_speed: float,
+	close_enough: int @ 0..,
+}
+dispatch runecraftory:npc_actions[runecraftory:walk_away] to struct {
+	walk_speed: float,
+	min_distance: float,
+	radius: int @ 0..,
+}
+dispatch runecraftory:npc_actions[runecraftory:keep_distance] to struct {
+	walk_speed: float,
+	min: float,
+	max: float,
+}
+dispatch runecraftory:npc_actions[runecraftory:random_walk] to struct {
+	walk_speed: float,
+	radius: int @ 0..,
+}
+dispatch runecraftory:npc_actions[runecraftory:walk_to_follow] to struct {
+	walk_speed: float,
+	close_enough: int @ 0..,
+}
+dispatch runecraftory:npc_actions[runecraftory:look_at_follow] to struct {
+}
+dispatch runecraftory:npc_actions[runecraftory:attack_with_weapon] to struct {
+}
+dispatch runecraftory:npc_actions[runecraftory:attack_with_spell] to struct {
+	spell: #[id] #[dispatcher_key="runecraftory:spells"] string,
+	ignore_seal: boolean,
+	amount?: NumberProvider,
+}
+dispatch runecraftory:npc_actions[runecraftory:throw_item] to struct {
+	items: [ItemStack] @ 1..,
+	throw_at_target: boolean,
+}
+enum(string) NPCActionTypes {
+	Idle = "runecraftory:do_nothing",
+	#[starred] WalkTo = "runecraftory:walk_to",
+	WalkAway = "runecraftory:walk_away",
+	KeepDistance = "runecraftory:keep_distance",
+	WalkRandomly = "runecraftory:random_walk",
+	FollowLeader = "runecraftory:walk_to_follow",
+	LookAtLeader = "runecraftory:look_at_follow",
+	#[starred] Attack = "runecraftory:attack_with_weapon",
+	AttackWithSpell = "runecraftory:attack_with_spell",
+	ThrowItem = "runecraftory:throw_item,"
+}
+struct NPCBehaviour {
+	type: NPCActionTypes,
+	...runecraftory:npc_actions[[type]]
+}
 dispatch minecraft:resource[runecraftory:npc_action] to struct NPCActions {
-	actions: [struct {
-		weight: int @ 1..,
-		predicate?: EntityPredicate,
-		concurrent_actions?: [struct {
-			type: #[id] #[dispatcher_key="runecraftory:npc_actions"] string,
-			...runecraftory:npc_actions[[type]]
-		}],
-	}],
+	sequence: [NPCBehaviour],
+	predicate?: EntityPredicate,
+	time_out: NumberProvider,
+	cooldown: NumberProvider,
+	weight: int @ 1..,
 }
 
 struct LootCondition {
@@ -453,72 +484,102 @@ struct LootCondition {
 	...runecraftory:loot_condition[[condition]],
 }
 
-dispatch minecraft:resource[runecraftory:conversation] to struct Conversation {
-	fallback_key:  string,
-	conversations: struct {
-		[string]: struct {
-			translation_key:  string,
-			min_hearts?:  int @ 0..,
-			max_hearts?:  int @ 0..,
-			starting_conversation?:  boolean,
-			actions?: [struct {
-				translation_key:  string,
-				action: ("ANSWER" | "QUEST"),
-				action_value:  string,
-				friend_xp:  int @ 0..,
-			}],
-			conditions: [LootCondition]
-		}
+struct Dialogue {
+	translation_key: string,
+	speaker?: string,
+}
+struct ConversationActions {
+	translation_key:  string,
+	actions: ("ANSWER" | "QUEST"),
+	value: string,
+	friend_xp?: int @ 0..,
+}
+struct Conversation {
+	dialogues: [(string | Dialogue)] @ 1..,
+	min_hearts?: NumberProvider,
+	max_hearts?: NumberProvider,
+	starting_conversation?: boolean,
+	actions?: [ConversationActions],
+	speakers: struct Speakers {
+		[string]: struct Speaker {
+			npc_id: #[id="runecraftory:npc_data"] string,
+			conditions: [LootCondition],
+		},
 	},
+	conditions: [LootCondition],
+}
+
+dispatch minecraft:resource[runecraftory:conversation] to struct ConversationSet {
+	fallback_key?: string,
+	conversations: struct ConversationMap {
+		[string]: Conversation
+	},
+}
+
+enum(string) ScheduleDays {
+	#[starred] WeekDays = "WEEKDAYS",
+	#[starred] WeekEnd = "WEEKEND",
+	Monday = "MONDAY",
+	Tuesday ="TUESDAY",
+	WedgnesDay = "WEDNESDAY",
+	Thursday = "THURSDAY",
+	Friday = "FRIDAY",
+	Saturday = "SATURDAY",
+	Sunday = "SUNDAY",
+}
+
+enum(string) ConversationContexts {
+	Introduction = "runecraftory:first",
+	Greeting = "runecraftory:greeting",
+	Talk = "runecraftory:talk",
+	TalkWhenFollow = "runecraftory:follow_talk",
+	FollowAccept = "runecraftory:follow_yes",
+	FollowDecline = "runecraftory:follow_no",
+	FollowStop = "runecraftory:follow_stop",
+	DefaultGift = "runecraftory:default_gift",
+	DatingAccept = "runecraftory:dating_accept",
+	DatingDeny = "runecraftory:dating_deny",
+	MarriageAccept = "runecraftory:marriage_accept",
+	MariageDeny = "runecraftory:marriage_deny",
+	Divorce = "runecraftory:divorce",
+	DivorceError = "runecraftory:divorce_error",
+	ProcreationCooldown = "runecraftory:procreation_cooldown",
 }
 
 dispatch minecraft:resource[runecraftory:npc_data] to struct NPCData {
 	name?: string,
 	surname?: string,
-	gender?: ("UNDEFINED" | "MALE" | "FEMALE"),
+	gender: ("UNDEFINED" | "MALE" | "FEMALE"),
 	profession?: #[id] #[dispatcher_key="runecraftory:professions"] string,
-	look?: [#[id] #[dispatcher_key="runecraftory:look"] string],
+	look?: [#[id="runecraftory:look"] string],
 	birthday?: struct {
 		season: ("SPRING" | "SUMMER" | "FALL" | "WINTER"),
 		day: int @ 1..30,
 	},
-	weight: int @ 1..,
+	weight: int @ 0..,
 	unique: int @ 0..,
-	relation: struct {
-		relation_ship_state: ("DEFAULT" | "NON_ROMANCEABLE" | "NO_ROMANCE_NPC" | "NO_ROMANCE"),
-		possible_children?: [#[id="runecraftory:npc_data"] string],
+	interactions: struct {
+		[ConversationContexts]: #[id="runecraftory:conversations"] string,
 	},
-	neutral_gift_response: string,
 	gift_items: struct {
 		[string]: struct {
 			gift_id: #[id="runecraftory:gift_data"] string,
-			response_key: string,
+			response_key: #[id="runecraftory:conversation"] string,
 			xp: int,
 		},
 	},
-	interactions: struct {
-		[#[id] #[dispatcher_key="runecraftory:conversation_contexts"] string]: #[id="runecraftory:conversations"] string,
-	},
-	quest_handler: struct {
-		responses: struct {
-			[#[id] string]: struct {
-				start_id: #[id] string,
-				active_id: #[id] string,
-				end_id: #[id] string,
-			}
-		},
-		required_quests: [#[id] string],
+	relation: struct {
+		relation_ship_state: ("DEFAULT" | "NON_ROMANCEABLE" | "NO_ROMANCE_NPC" | "NO_ROMANCE"),
+		possible_children?: [#[id="runecraftory:npc_data"] string],
+		required_quests: [#[id="simplequests:quest"] string],
 	},
 	schedule?: struct {
-		wake_up_time: int @ 0..,
-		work_time: int @ 1..,
-		break_time: int @ 1..,
-		work_time_after: int @ 1..,
-		done_work_time: int @ 1..,
-		meet_time: int @ 1..,
-		meet_time_after: int @ 1..,
-		sleep_time: int @ 1..,
-		work_days: [("MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY")],
+		[ScheduleDays]: [struct {
+			time: int @ 0..,
+			activity: #[id="minecraft:activity"] string,
+			social_chance?: float,
+			poi: #[id="minecraft:poi_type"] string,
+		}],
 	},
 	combat?: struct {
 		base_level?: int @ 1..,
@@ -532,24 +593,19 @@ dispatch minecraft:resource[runecraftory:npc_data] to struct NPCData {
 	},
 }
 
-dispatch minecraft:resource[runecraftory:npc_gift] to struct GiftData {
-	items: [#[id=(registry="item", tags="allowed")] string],
-	xp_range: struct {
-		min?: int,
-		max?: int,
-	},
-	translations: [string] @ 1..,
-}
-
 dispatch minecraft:resource[runecraftory:npc_look] to struct NPCLook {
 	player_skin?: string,
-	gender?: ("UNDEFINED" | "MALE" | "FEMALE"),
+	gender: ("UNDEFINED" | "MALE" | "FEMALE"),
 	weight: int @ 0..,
 	additional_features: [LookFeature],
+	conditional_features: [struct {
+		feature: LookFeature,
+		predicate: EntityPredicate,
+	}]
 }
 
 struct LookFeature {
-	type: #[id] #[dispatcher_key="runecraftory:npc_look_feature"] string,
+	type: LookFeatureTypes,
 	...runecraftory:npc_look_feature[[type]]
 }
 
@@ -557,16 +613,20 @@ type ColorSetting = [(#[color="hex_rgb"] int | struct {
 	color_min: #[color="hex_rgb"] int,
 	color_max: #[color="hex_rgb"] int,
 })]
-
-type TypedIndexRange = [struct {
-	weight: int,
-	outfit: string,
-	range: struct {
+struct IndexedColorSetting {
+	/// Which texture to use. For simple features the textures are simply numbered
+	indices: [int],
+	colors:  ColorSetting,
+}
+type WeightedIndexedTexture = [struct {
+	texture: #[id] string,
+	/// Most textures have an index suffix (e.g. outfit/1.png). This allows randomly selecting of based on indices
+	range?: struct {
 		type: RangeType,
 		...runecraftory:range_types[[type]]
-	}
+	},
+	weight: int,
 }]
-
 enum(string) RangeType {
 	FIRST_N = "FIRST_N",
 	RANGE = "RANGE",
@@ -574,6 +634,7 @@ enum(string) RangeType {
 }
 
 dispatch runecraftory:range_types[FIRST_N] to struct {
+	/// Selects a random int between 0...n (n exclusive)
 	amount: int @ 0..,
 }
 dispatch runecraftory:range_types[RANGE] to struct {
@@ -581,45 +642,94 @@ dispatch runecraftory:range_types[RANGE] to struct {
 	max:  int,
 }
 dispatch runecraftory:range_types[SELECTED] to struct {
+	/// Selects a random int from the given list
 	indices: [int],
 }
 
-dispatch runecraftory:npc_look_feature[runecraftory:skin_feature] to struct {
-	indices: [int],
-	colors:  ColorSetting,
+enum(string) LookFeatureTypes {
+	Slim = "runecraftory:slim_feature",
+	Size = "runecraftory:size_feature",
+	Model = "runecraftory:model_feature",
+	Skin = "runecraftory:skin_feature",
+	Face = "runecraftory:face_feature",
+	Blush = "runecraftory:blush_feature",
+	Hair = "runecraftory:hair_feature",
+	Chest = "runecraftory:chest_size",
+	Outfit = "runecraftory:outfit_feature",
+	Hat = "runecraftory:simple_hat_feature",
+	Attachments = "runecraftory:model_attachment_feature",
 }
-dispatch runecraftory:npc_look_feature[runecraftory:iris_feature] to struct {
-	indices: [int],
-	colors:  ColorSetting,
+dispatch runecraftory:npc_look_feature[runecraftory:slim_feature] to struct {}
+dispatch runecraftory:npc_look_feature[runecraftory:size_feature] to struct {
+	/// Size of the npc. Clamped between 0.2 and 10
+	size: NumberProvider,
 }
-dispatch runecraftory:npc_look_feature[runecraftory:sclera_feature] to struct {
-	indices: [int],
-	colors:  ColorSetting,
+dispatch runecraftory:npc_look_feature[runecraftory:model_feature] to struct {
+	/// A custom model to use
+	model?: struct {
+		/// Model id. Model path is under path is under assets/<namespace>/tenshilib/models/<path>.geo.json
+		model: #[id] string,
+		layerPrefix: string,
+		texture?: #[id] string,
+	},
+	/// A custom animation to use. Animation path is under assets/<namespace>/tenshilib/animations/<path>.json
+	animation?: #[id] string,
 }
-dispatch runecraftory:npc_look_feature[runecraftory:eyebrows_feature] to struct {
-	indices: [int],
-	colors:  ColorSetting,
+dispatch runecraftory:npc_look_feature[runecraftory:skin_feature] to IndexedColorSetting
+dispatch runecraftory:npc_look_feature[runecraftory:face_feature] to struct {
+	iris: IndexedColorSetting,
+	sclera: IndexedColorSetting,
+	eyebrow: IndexedColorSetting,
+	/// ATM not used
+	expressions: struct {
+		[string]: struct {
+			iris: struct {
+				suffix: string,
+				use_skin_color: boolean,
+			},
+			sclera: struct {
+				suffix: string,
+				use_skin_color: boolean,
+			},
+			eyebrow: string,
+		}
+	}
 }
 dispatch runecraftory:npc_look_feature[runecraftory:blush_feature] to struct {
 	chance: float,
 	colors:  ColorSetting,
 }
 dispatch runecraftory:npc_look_feature[runecraftory:hair_feature] to struct {
-	styles: TypedIndexRange,
-	colors:  ColorSetting,
+	/// Hair textures. The texture path is assets/<namespace>/textures/npc/entity/hair/<path>.png
+	hairs: WeightedIndexedTexture,
+	colors: ColorSetting,
 }
-dispatch runecraftory:npc_look_feature[runecraftory:outfit_feature] to struct {
-	outfits: TypedIndexRange,
-}
-dispatch runecraftory:npc_look_feature[runecraftory:simple_hat_feature] to [string]
-dispatch runecraftory:npc_look_feature[runecraftory:slim_feature] to struct {}
-dispatch runecraftory:npc_look_feature[runecraftory:size_feature] to struct {
+dispatch runecraftory:npc_look_feature[runecraftory:chest_size] to struct {
+	/// Size of the npcs breasts. Not gender bound. Clamped between 0 and 1 although 0 does not mean nothing
 	size: NumberProvider,
 }
-dispatch runecraftory:npc_look_feature[runecraftory:model_feature] to struct {
-	models: [{
-		model: #[id] string,
-		textures: [#[id] string]
+dispatch runecraftory:npc_look_feature[runecraftory:outfit_feature] to struct {
+	/// Outfit textures. The texture path is assets/<namespace>/textures/npc/entity/outfit/<path>.png
+	outfits: WeightedIndexedTexture,
+}
+dispatch runecraftory:npc_look_feature[runecraftory:simple_hat_feature] to struct {
+	hats: [struct {
+		/// Hat texture. The texture path is assets/<namespace>/textures/npc/entity/misc/<path>.png
+		texture: #[id] string,
+		weight: int @ 1..,
 	}],
-	location: ("HEAD" | "BODY" | "LEFT_ARM" | "RIGHT_ARM" | "LEFT_LEG" | "RIGHT_LEG")
+}
+type ModelParts = ("HEAD" | "BODY" | "LEFT_ARM" | "RIGHT_ARM" | "LEFT_LEG" | "RIGHT_LEG")
+dispatch runecraftory:npc_look_feature[runecraftory:model_attachment_feature] to struct {
+	models: [struct {
+		/// Model id. Model path is under path is under assets/<namespace>/tenshilib/models/<path>.geo.json
+		model: #[id] string,
+		/// Animation id. Animation path is under assets/<namespace>/tenshilib/animations/<path>.json
+		animation: #[id] string,
+		texture: [#[id] string],
+		/// What part of the body to attach to
+		location: (ModelParts),
+		/// What part of the body to hide when this attachment is visible
+		hidden: [ModelParts],
+	}],
 }

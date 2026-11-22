@@ -9,19 +9,21 @@ type EntityHolderSetV2 = ([#[id="entity_type"] string] | #[id(registry="entity_t
 
 dispatch minecraft:resource[equal_loot:entity] to struct Config {
 	/// A tag or list of entities that apply to this config
-  	include: EntityHolderSet,
+	include: EntityHolderSet,
 	/// A tag or list of entities that are excluded from this config
-  	exclude: EntityHolderSetV2,
+	exclude: EntityHolderSetV2,
 	/// The amount of players that can receive the loot at max. Set to 0 to have no limit
-  	max_players: int,
+	max_players: int,
 	/// The minimum damage a player needs to do to count
-  	min_damage: float,
-  	/// If true min_damage is treated as a percentage value based on the mobs max health. Otherwise min_damage is the flat amount of damage required
+	min_damage: float,
+	/// If true min_damage is treated as a percentage value based on the mobs max health. Otherwise min_damage is the flat amount of damage required
 	percentage: boolean,
-  	/// Time in ticks the player needed to hit the mobs within to count. So if the player hasnt hit the mob in this time they wont receive the loot
+	/// Time in ticks the player needed to hit the mobs within to count. So if the player hasnt hit the mob in this time they wont receive the loot
 	damaged_within: int,
-  	/// How the loot of the killing player should be handled. See wiki
+	/// How the loot of the killing player should be handled. See wiki
 	killer_handling: "always" | "fill" | "requirements",
 	/// Only relevant if a config overlaps with another. This defines which config will take precedence then
-  	priority: int,
+	priority: int,
+	/// If true will apply glowing to the drops
+	glowing_drops?: boolean,
 }

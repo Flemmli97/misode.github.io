@@ -6,21 +6,29 @@ use ::java::data::advancement::predicate::BlockPredicate
 use ::java::world::item::ItemStack
 
 struct QuestCategory {
+	/// Name of the category
 	name: string,
+	/// A list of description for this category. optional
 	description?: [string],
+	/// Icon used in the gui
 	icon?: ItemStack,
+	/// Default: false. If true only counts quests in the same category towards the max concurrent quest limit
 	only_same_category?: boolean,
+	/// Default -1. Max amount of quests the player can have at once for this category. If only_same_category is true only counts quests for this category. Else counts all active quests. -1 = the config value. 0 = no limit
 	max_concurrent_quests?: int,
+	/// Default 0. Lower value = Displayed first in the gui
 	sorting_id?: int,
+	/// Default -1. Maximum amount of quests acceptable per day in this category
 	max_daily?: int,
+	/// Default true. If false quests in this category will not be visible
 	is_visible?: boolean,
+	/// Default false. If true quests in this category will not have send chat notifications
 	is_silent?: boolean,
+	/// Optional. List of string context. This only concerns devs. Blocks access to quests if not providing correct context
 	required_contexts?: [string],
 }
 
 dispatch minecraft:resource[simplequests:category] to QuestCategory
-
-dispatch minecraft:resource[simplequests:category_legacy] to QuestCategory
 
 type DescriptiveValue<C> = struct {
 	description: string,
@@ -30,53 +38,42 @@ type DescriptiveValue<C> = struct {
 type NumberProvider = (
 	float |
 	struct {
-		type?: #[id="loot_number_provider_type"] string,
+		type?: (#[id="loot_number_provider_type"] #[dispatcher_key="simplequests:number_provider"] string),
 		...minecraft:number_provider[[type]],
+		...simplequests:number_provider[[type]],
 	}
 )
 
-dispatch minecraft:number_provider[simplequests_api:context_multiplier] to struct QuestContextMultiplier {
+dispatch simplequests:number_provider[simplequests_api:context_multiplier] to struct QuestContextMultiplier {
 	value: NumberProvider,
 	multiplier: float,
 	max?: float
 }
 
-// Quest Entries
-dispatch simplequests:entry[simplequests_api:advancement] to struct AdvancementTask {
+// Quest Tasks
+dispatch simplequests:task[simplequests_api:advancement] to struct AdvancementTask {
 	advancements: [DescriptiveValue<#[id=advancement] string>],
 	reset: boolean,
 	description?: string,
 	player_predicate?: EntityPredicate,
 }
-dispatch simplequests:entry[simplequests_api:item] to struct ItemEntry {
-	predicates: [DescriptiveValue<ItemPredicate>],
-	amount: NumberProvider,
-	consume_items: boolean,
-	description?: string,
-	player_predicate?: EntityPredicate,
-}
-dispatch simplequests:entry[simplequests_api:kill] to struct KillTask {
-	predicates: [DescriptiveValue<EntityPredicate>],
-	amount: NumberProvider,
-	description?: string,
-	player_predicate?: EntityPredicate,
-}
-dispatch simplequests:entry[simplequests_api:xp] to struct XPTask {
-	amount: NumberProvider,
-	description?: string,
-	player_predicate?: EntityPredicate,
-}
-dispatch simplequests:entry[simplequests_api:block_interact] to struct BlockInteractTask {
+dispatch simplequests:task[simplequests_api:block_interact] to struct BlockInteractTask {
 	block_predicates: [DescriptiveValue<BlockPredicate>],
 	item_predicates?: [DescriptiveValue<ItemPredicate>],
 	amount: NumberProvider,
 	consume: boolean,
 	use: boolean,
-	allow_dupes: boolean,
+	allow_dupes?: boolean,
 	description?: string,
 	player_predicate?: EntityPredicate,
 }
-dispatch simplequests:entry[simplequests_api:entity_interact] to struct EntityInteractTask {
+dispatch simplequests:task[simplequests_api:crafting, simplequests_api:fishing] to struct ItemAssignedTask {
+	item_predicates: [DescriptiveValue<ItemPredicate>],
+	amount: NumberProvider,
+	description?: string,
+	player_predicate?: EntityPredicate,
+}
+dispatch simplequests:task[simplequests_api:entity_interact] to struct EntityInteractTask {
 	entity_predicates: [DescriptiveValue<EntityPredicate>],
 	item_predicates?: [DescriptiveValue<ItemPredicate>],
 	amount: NumberProvider,
@@ -84,16 +81,28 @@ dispatch simplequests:entry[simplequests_api:entity_interact] to struct EntityIn
 	description?: string,
 	player_predicate?: EntityPredicate,
 }
-dispatch simplequests:entry[simplequests_api:crafting, simplequests_api:fishing] to struct ItemAssignedTask {
-	item_predicates: [DescriptiveValue<ItemPredicate>],
+dispatch simplequests:task[simplequests_api:item] to struct ItemEntry {
+	predicates: [DescriptiveValue<ItemPredicate>],
+	amount: NumberProvider,
+	consume_items: boolean,
+	description?: string,
+	player_predicate?: EntityPredicate,
+}
+dispatch simplequests:task[simplequests_api:kill] to struct KillTask {
+	predicates: [DescriptiveValue<EntityPredicate>],
 	amount: NumberProvider,
 	description?: string,
 	player_predicate?: EntityPredicate,
 }
-dispatch simplequests:entry[simplequests_api:predicates] to struct PredicateTask {
+dispatch simplequests:task[simplequests_api:predicates] to struct PredicateTask {
 	predicates: [DescriptiveValue<EntityPredicate>],
 	description?: string,
 	submit: boolean,
+}
+dispatch simplequests:task[simplequests_api:xp] to struct XPTask {
+	amount: NumberProvider,
+	description?: string,
+	player_predicate?: EntityPredicate,
 }
 
 type Time = (
@@ -103,15 +112,55 @@ type Time = (
 	int
 )
 
-struct QuestEntry {
-	id: (#[name="Builtin"] QuestEntryTypes | string),
-	...simplequests:entry[[id]],
-}
-struct QuestTasksMap {
-	[string]: QuestEntry,
+struct QuestTask {
+	id: (#[name="Builtin"] QuestTaskTypes | #[name="Others"] #[dispatcher_key="simplequests:additional_task_types"] ModdedQuestTaskTypes),
+	...simplequests:task[[id]],
 }
 
-enum(string) QuestEntryTypes {
+type QuestHolder = (QuestBase | #[id="simplequests:quest"] string)	
+
+// Quest types
+dispatch simplequests:quests[simplequests_api:quest] to struct Quest {
+	loot_table?: #[id="loot_table"] string,
+	command?: string,
+	submission_trigger?: string,
+	tasks: struct Tasks {
+		[string]: QuestTask,
+	},
+}
+dispatch simplequests:quests[simplequests_api:composite_quest] to struct CompositeQuest {
+	// API 3.0.0+ or mod 2.3.0+ only supports quests otherwise needs id 
+	quests: [QuestHolder] @ 1..,
+}
+dispatch simplequests:quests[simplequests_api:sequential_quest] to struct SequentialQuest {
+	// API 3.0.0+ or mod 2.3.0+ only supports quests otherwise needs id 
+	quests: [QuestHolder] @ 1..,
+	loot_table?: #[id="loot_table"] string,
+	command?: string,
+}
+
+struct QuestBase {
+	category?: #[id="simplequests:quest_category"] string,
+	name: string,
+	description?: [string],
+	parent_id?: #[id="simplequests:quest"] string, 
+	redo_parent?: boolean,
+	repeat_delay?: Time,
+	repeat_daily?: int @ 0..,
+	max_repeat?: int @ 0..,
+	daily_quest?: boolean,
+	need_unlock?: boolean,
+	unlock_condition?: EntityPredicate,
+	sorting_id?: int,
+	icon?: ItemStack,
+	visibility?: ("DEFAULT" | "ALWAYS" | "NEVER"),
+	type: (#[name="Builtin"] QuestTypes | #[name="Others"] #[dispatcher_key="simplequests:additional_quest_types"] string),
+	...simplequests:quests[[type]],
+}
+
+dispatch minecraft:resource[simplequests:quest] to QuestBase
+
+enum(string) QuestTaskTypes {
 	#[starred] ItemTask = "simplequests_api:item",
 	#[starred] KillTask = "simplequests_api:kill",
 	AdvancementTask = "simplequests_api:advancement",
@@ -121,101 +170,43 @@ enum(string) QuestEntryTypes {
 	FishingTask = "simplequests_api:fishing",
 	PredicateTask = "simplequests_api:predicates",
 	XPTask = "simplequests_api:xp",
+	// Modded types. Would like to not be enum but strings can't have labels or fancy selection
+	#[name="Delivery (Runecraftory)"] Level = "runecraftory:delivery",
 	#[name="Level (Runecraftory)"] Level = "runecraftory:level",
-	#[name="Talk to (Runecraftory)"] NPCTalk = "runecraftory:npc_talk",
+	#[name="Talk (Runecraftory)"] NPCTalk = "runecraftory:npc_talk",
 	#[name="Shipping (Runecraftory)"] Shipping = "runecraftory:shipping",
 	#[name="Skill Level (Runecraftory)"] SkillLevel = "runecraftory:skill_level",
 	#[name="Taming (Runecraftory)"] Taming = "runecraftory:taming",
 }
 
-type QuestHolder = (QuestBase | #[id="simplequests:quest"] string)
-
-// Quest types
-dispatch simplequests:quests[simplequests_api:quest] to struct Quest {
-	loot_table?: #[id="loot_table"] string,
-	command?: string,
-	submission_trigger?: string,
-	tasks: QuestTasksMap,
-}
-dispatch simplequests:quests[simplequests_api:composite_quest] to struct CompositeQuest {
-	// API 3.0.0+ or mod 2.3.0+ only supports quests otherwise needs id 
-	quests: [QuestHolder] @ 1..,
-}
-dispatch simplequests:quests[simplequests_api:sequential_quest] to struct SequentialQuest {
-	loot_table: #[id="loot_table"] string,
-	command?: string,
-	// API 3.0.0+ or mod 2.3.0+ only supports quests otherwise needs id 
-	quests: [QuestHolder] @ 1..,
-}
-
-struct QuestBase {
-	category?: #[id="simplequests:quest_category"] string,
-	name: string,
-	description?: [string],
-	parent_id?: #[id="simplequests:quest"] string, 
-	redo_parent?: boolean,
-	need_unlock?: boolean,
-	unlock_condition?: EntityPredicate,
-	icon?: ItemStack,
-	repeat_delay?: Time,
-	repeat_daily?: int @ 0..,
-	max_repeat?: int @ 0..,
-	sorting_id?: int,
-	daily_quest?: boolean,
-	visibility?: ("DEFAULT" | "ALWAYS" | "NEVER"),
-	type: (#[name="Builtin"] QuestTypes | string),
-	...simplequests:quests[[type]],
-}
-
-dispatch minecraft:resource[simplequests:quest] to QuestBase
-
-dispatch minecraft:resource[simplequests:quest_legacy] to QuestBase
-
 enum(string) QuestTypes {
 	#[starred] Quest = "simplequests_api:quest",
 	SequentialQuest = "simplequests_api:sequential_quest",
 	CompositeQuest = "simplequests_api:composite_quest",
-	#[name="NPCQuest (Runecraftory)"] NPCQuest = "runecraftory:npc_quest",
+	// Modded types. Would like to not be enum but strings can't have labels or fancy selection
+	#[name="NPC Quest (Runecraftory)"] NPC = "runecraftory:npc_quest",
 }
 
 // Runecraftory
 
-dispatch simplequests:quests[runecraftory:npc_quest] to struct {
-	quest_givers: [#[id="runecraftory:npc_data"] string],
-	quests: [struct {
-		quest: QuestHolder,
-		dialogues: struct {
-			start_id?: #[id="runecraftory:conversation"] string,
-			active_id?: #[id="runecraftory:conversation"] string,
-			end_id?: #[id="runecraftory:conversation"] string,
-		}
-	}],
-	loot_table: #[id="loot_table"] string,
-	global?: boolean,
-	conditions?: [struct {
-		condition: #[id="loot_condition_type"] #[dispatcher_key="runecraftory:loot_condition_type"] string,
-		...minecraft:loot_condition[[condition]],
-		...runecraftory:loot_condition[[condition]],
-	}],
-}
-
-dispatch simplequests:entry[runecraftory:delivery] to struct {
+dispatch simplequests:task[runecraftory:delivery] to struct {
 	target_npc_id?: #[id="runecraftory:npc_data"] string,
 	dialogue?: #[id="runecraftory:conversation"] string,
 	items: [DescriptiveValue<ItemPredicate>],
 	amount: NumberProvider,
 }
-dispatch simplequests:entry[runecraftory:level] to struct {
+dispatch simplequests:task[runecraftory:level] to struct {
 	level: NumberProvider,
 	description: string,
 }
-dispatch simplequests:entry[runecraftory:npc_talk] to struct {
+dispatch simplequests:task[runecraftory:npc_talk] to struct {
 	/// Not implemented
 	target_npc_id?: #[id="runecraftory:npc_data"] string,
 	dialogue?: #[id="runecraftory:conversation"] string,
+	loot_return?:  #[id="loot_table"] string,
 	predicate?: EntityPredicate
 }
-dispatch simplequests:entry[runecraftory:shipping] to struct {
+dispatch simplequests:task[runecraftory:shipping] to struct {
 	item_predicates: [DescriptiveValue<ItemPredicate>],
 	amount: NumberProvider,
 	description: string,
@@ -257,13 +248,32 @@ type Skills = (
     "TAMING" |
     "LEADER"
 )
-dispatch simplequests:entry[runecraftory:skill_level] to struct {
+dispatch simplequests:task[runecraftory:skill_level] to struct {
 	skill: [Skills],
 	level: NumberProvider,
 	description: string,
 }
-dispatch simplequests:entry[runecraftory:taming] to struct {
+dispatch simplequests:task[runecraftory:taming] to struct {
 	predicates: [DescriptiveValue<EntityPredicate>],
 	amount: NumberProvider,
 	description: string,
+}
+
+dispatch simplequests:quests[runecraftory:npc_quest] to struct {
+	quest_givers: [#[id="runecraftory:npc_data"] string],
+	quests: [struct {
+		quest: QuestHolder,
+		dialogues: struct {
+			start_id?: #[id="runecraftory:conversation"] string,
+			active_id?: #[id="runecraftory:conversation"] string,
+			end_id?: #[id="runecraftory:conversation"] string,
+		}
+	}],
+	loot_table: #[id="loot_table"] string,
+	global?: boolean,
+	conditions?: [struct {
+		condition: #[id="loot_condition_type"] #[dispatcher_key="runecraftory:loot_condition_type"] string,
+		...minecraft:loot_condition[[condition]],
+		...runecraftory:loot_condition[[condition]],
+	}],
 }

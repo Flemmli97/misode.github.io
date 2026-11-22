@@ -1,5 +1,2 @@
 {
-  "loot_number_provider_type": [
-    "simplequests_api:context_multiplier"
-  ]
 }
