@@ -471,6 +471,7 @@ struct NPCBehaviour {
 	...runecraftory:npc_actions[[type]]
 }
 dispatch minecraft:resource[runecraftory:npc_action] to struct NPCActions {
+	/// The npc will execute the actions in this list in order
 	sequence: [NPCBehaviour],
 	predicate?: EntityPredicate,
 	time_out: NumberProvider,
@@ -486,6 +487,7 @@ struct LootCondition {
 
 struct Dialogue {
 	translation_key: string,
+	/// Optional speaker. Defined in the conversations speaker field
 	speaker?: string,
 }
 struct ConversationActions {
@@ -495,11 +497,17 @@ struct ConversationActions {
 	friend_xp?: int @ 0..,
 }
 struct Conversation {
+	/// List of dialogues for this conversation
 	dialogues: [(string | Dialogue)] @ 1..,
+	/// Min required hearts for this conversation
 	min_hearts?: NumberProvider,
+	/// Max required hearts for this conversation
 	max_hearts?: NumberProvider,
+	/// Default true. If false npc will never use this to start a conversation. Should be false for action responses
 	starting_conversation?: boolean,
+	/// List of conversation actions the player can take after this conversation played
 	actions?: [ConversationActions],
+	/// Allows defining participants in this conversation. Will be referenced by dialogues
 	speakers: struct Speakers {
 		[string]: struct Speaker {
 			npc_id: #[id="runecraftory:npc_data"] string,
@@ -594,10 +602,12 @@ dispatch minecraft:resource[runecraftory:npc_data] to struct NPCData {
 }
 
 dispatch minecraft:resource[runecraftory:npc_look] to struct NPCLook {
+	/// If a player skin is used layer settings (such as hair, face etc.) are ignored!
 	player_skin?: string,
 	gender: ("UNDEFINED" | "MALE" | "FEMALE"),
 	weight: int @ 0..,
 	additional_features: [LookFeature],
+	/// Features that should be enabled only when the given condition is met
 	conditional_features: [struct {
 		feature: LookFeature,
 		predicate: EntityPredicate,
@@ -713,6 +723,7 @@ dispatch runecraftory:npc_look_feature[runecraftory:outfit_feature] to struct {
 	outfits: WeightedIndexedTexture,
 }
 dispatch runecraftory:npc_look_feature[runecraftory:simple_hat_feature] to struct {
+	/// Simple hats. Simple since they will use the main model and simply add a hat layer on top
 	hats: [struct {
 		/// Hat texture. The texture path is assets/<namespace>/textures/npc/entity/misc/<path>.png
 		texture: #[id] string,
