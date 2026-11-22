@@ -576,10 +576,10 @@ dispatch minecraft:resource[runecraftory:npc_data] to struct NPCData {
 			xp: int,
 		},
 	},
-	relation: struct {
-		relation_ship_state: ("DEFAULT" | "NON_ROMANCEABLE" | "NO_ROMANCE_NPC" | "NO_ROMANCE"),
+	relation?: struct {
+		relation_ship_state?: ("DEFAULT" | "NON_ROMANCEABLE" | "NO_ROMANCE_NPC" | "NO_ROMANCE"),
 		possible_children?: [#[id="runecraftory:npc_data"] string],
-		required_quests: [#[id="simplequests:quest"] string],
+		required_quests?: [#[id="simplequests:quest"] string],
 	},
 	schedule?: struct {
 		[ScheduleDays]: [struct {
